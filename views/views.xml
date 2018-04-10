@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="type_body_system_view_tree">
+            <field name="name">type_body_system_view_tree</field>
+            <field name="model">type.body.system</field>
+			<field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Type Body Systems">
+					<field name="nickname" />
+					<field name="name" />
+					<field name="type"/>					
+					<field name="active"/>
+                </tree>
+            </field>
+        </record>
+		<record model="ir.ui.view" id="type_body_system_view_form">
+            <field name="name">type_body_system_view_form</field>
+            <field name="model">type.body.system</field>
+			<field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Type Body System">
+					<sheet string="Type Body System">
+						<group>
+							<field name="system_ids"    attrs="{'invisible':True}"/>
+						    <field name="bodypart_ids"  attrs="{'invisible':True}"/>					    
+						    <field name="name" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}" />
+							<field name="nickname" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}" />
+							<field name="type" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}" />
+							<field name="active" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}" />
+							<label colspan="4" string="Sólo se permite Activar o Inactivar; por estar asociado a otro registro!" attrs="{'invisible':[('system_ids','=',[]),('bodypart_ids','=',[])]}"/> 
+						</group>		
+					</sheet>
+   				</form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="type_body_system_action">
+            <field name="name">Type Body Systems</field>
+            <field name="res_model">type.body.system</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+        </record>
+	</data>
+</openerp>

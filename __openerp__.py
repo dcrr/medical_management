@@ -6,7 +6,9 @@
     'category' : 'Medical',
     'description' : """ Medical Management """,
     "depends" : ['base'],
-	'data' : [],
+	'data' : ['views/views.xml',
+              'views/menu.xml',
+              ],
 	'active': True,
     'installable': True	
 }

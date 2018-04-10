@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+    <menuitem name ="Medical Management" id="medical_management_root_menu"/>
+    <menuitem name ="Configuration" parent="medical_management_root_menu" id="medical_management_configuracion_menu"/>
+    <menuitem name ="Type Body Systems" parent="medical_management_configuracion_menu" id="type_body_systems_menu"  action="type_body_system_action"/>
+    </data>
+</openerp>
