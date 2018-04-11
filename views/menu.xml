@@ -3,6 +3,13 @@
 	<data>
     <menuitem name ="Medical Management" id="medical_management_root_menu"/>
     <menuitem name ="Configuration" parent="medical_management_root_menu" id="medical_management_configuracion_menu"/>
-    <menuitem name ="Type Body Systems" parent="medical_management_configuracion_menu" id="type_body_systems_menu"  action="type_body_system_action"/>
+    <menuitem name ="Types Body Systems" parent="medical_management_configuracion_menu" id="type_body_systems_menu" action="type_body_system_action"/>
+    <menuitem name ="Body Parts" parent="medical_management_configuracion_menu" id="body_part_menu"  action="body_part_action"/>
+    <menuitem name ="Types of Diseases" parent="medical_management_configuracion_menu" id="type_disease_menu" action="type_disease_action" />
+	<menuitem name ="Diseases" parent="medical_management_configuracion_menu" id="disease_menu"  action="disease_action" />
+    <menuitem name ="Types Medical Appointments" parent="medical_management_configuracion_menu" id="type_medical_appointment_menu" action="type_medical_appointment_action"/>
+    <menuitem name ="Nursing Services" parent="medical_management_configuracion_menu" id="nursing_service_menu"  action="nursing_service_action" />
+    <menuitem name ="Medical Specializations" parent="medical_management_configuracion_menu" id="specialization_menu"  action="specialization_action"/>
+    <menuitem name ="Medical Staff" parent="medical_management_configuracion_menu" id="medical_staff_menu"  action="medical_staff_action" />
     </data>
 </openerp>
