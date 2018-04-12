@@ -5,7 +5,7 @@
     'author' : 'Eduardo Tirado, Diana Rojas',
     'category' : 'Medical',
     'description' : """ Medical Management """,
-    "depends" : ['base'],
+    "depends" : ['base', 'resource', 'hr'],
 	'data' : ['views/views.xml',
               'views/menu.xml',
               ],

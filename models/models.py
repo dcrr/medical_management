@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api
+from openerp.exceptions import ValidationError
 
 # Apparatus or body systems
-class type_body_system(models.Model):	
-	_name = 'type.body.system'
+class medical_body_system_type(models.Model):	
+	_name = 'medical.body.system.type'
 
 	@api.onchange('nickname')
 	def _onchange_nickname(self):
@@ -20,8 +21,8 @@ class type_body_system(models.Model):
 	nickname = fields.Char(string='Nickname', size=8, required=True, help = 'Short name')
 	type = fields.Selection([('apparatus','Apparatus'),('system','System')], 'Apparatus or System',required=True)
 	active = fields.Boolean(string='Active', default=True)
-	bodypart_ids = fields.One2many('body.part', 'apparatus_id',"Body Parts", ondelete='restrict')
-	system_ids = fields.One2many('body.part', 'system_id',"systems", ondelete='restrict')
+	body_part_ids = fields.One2many('medical.body.part', 'apparatus_id',"Body Parts", ondelete='restrict')
+	system_ids = fields.One2many('medical.body.part', 'system_id',"Systems", ondelete='restrict')
 
 	# sort by name
 	_order = 'name'
@@ -30,8 +31,8 @@ class type_body_system(models.Model):
         ('nickname_uniq', 'unique (nickname)', 'The nickname must be unique!'),]
 
 # Body Parts
-class body_part(models.Model):
-	_name = 'body.part'
+class medical_body_part(models.Model):
+	_name = 'medical.body.part'
 
 	@api.onchange('nickname')
 	def _onchange_nickname(self):
@@ -46,8 +47,8 @@ class body_part(models.Model):
 	name = fields.Char(string='Description', size=120, required=True, help = 'Body Part description')
 	nickname = fields.Char(string='Nickname', size=8, required=True, help = 'Short name')
 	location = fields.Selection([('L','Left'),('R','Right'), ('B','Both'),('N','Not Apply')], 'Location',required=True)
-	apparatus_id = fields.Many2one('type.body.system', 'Apparatus', domain=['&',('active','=',True),('type','=','apparatus')], ondelete='restrict')
-	system_id = fields.Many2one('type.body.system', 'System', domain=['&',('active','=',True),('type','=','system')], ondelete='restrict')
+	apparatus_id = fields.Many2one('medical.body.system.type', 'Apparatus', domain=['&',('active','=',True),('type','=','apparatus')], ondelete='restrict')
+	system_id = fields.Many2one('medical.body.system.type', 'System', domain=['&',('active','=',True),('type','=','system')], ondelete='restrict')
 	active = fields.Boolean(string='Active', default=True)
 
 	_order = 'name'	
@@ -56,8 +57,8 @@ class body_part(models.Model):
         ('nickname_uniq', 'unique (nickname)', 'The nickname must be unique!'),]
 	
 # Type of disease
-class type_disease(models.Model):
-	_name = "type.disease" 
+class medical_disease_type(models.Model):
+	_name = "medical.disease.type" 
 	
 	@api.onchange('nickname')
 	def _onchange_nickname(self):
@@ -72,7 +73,7 @@ class type_disease(models.Model):
 	name = fields.Char(string='Description', size=120, required=True, help = 'Full Disease Description')
 	nickname = fields.Char(string='Nickname', size=8, required=True, help = 'Short name')
 	active = fields.Boolean(string='Active', default=True)
-	enfermedad_ids = fields.One2many('disease', 'type_disease_id', "Diseases",ondelete='restrict')
+	enfermedad_ids = fields.One2many('medical.disease', 'disease_type_id', "Diseases",ondelete='restrict')
     
 	_order = 'name'	
 	_sql_constraints = [
@@ -80,8 +81,8 @@ class type_disease(models.Model):
         ('nickname_uniq', 'unique (nickname)', 'The nickname must be unique!'),]
 	
 # Disease
-class disease(models.Model): 
-	_name = "disease"
+class medical_disease(models.Model): 
+	_name = "medical.disease"
 
 	@api.onchange('nickname')
 	def _onchange_nickname(self):
@@ -95,15 +96,15 @@ class disease(models.Model):
 
 	name = fields.Char(string='Description', size=500, required=True, help = 'Disease description')
 	nickname = fields.Char(string='Nickname', size=8, required=True, help = 'Short name')
-	type_disease_id = fields.Many2one('type.disease', 'Type of Disease', required=True, domain="[('active','=',True)]", ondelete="restrict")
+	disease_type_id = fields.Many2one('medical.disease.type', 'Type of Disease', required=True, domain="[('active','=',True)]", ondelete="restrict")
 	active = fields.Boolean(string='Active', default=True)
     
 	_order = 'name'	
 	_sql_constraints = [('nickname_uniq', 'unique (nickname)', 'The nickname must be unique!'),]
 
 # Types of medical appointments
-class type_medical_appointment(models.Model):
-	_name = "type.medical.appointment" 
+class medical_appointment_type(models.Model):
+	_name = "medical.appointment.type" 
 
 	@api.onchange('nickname')
 	def _onchange_nickname(self):
@@ -126,8 +127,8 @@ class type_medical_appointment(models.Model):
         ('nickname_uniq', 'unique (nickname)', 'The nickname must be unique!'),]
 	
 # Services provided by nursing
-class nursing_service(models.Model):
-	_name = "nursing.service"
+class medical_nursing_service(models.Model):
+	_name = "medical.nursing.service"
 
 	@api.onchange('nickname')
 	def _onchange_nickname(self):
@@ -161,9 +162,9 @@ class nursing_service(models.Model):
         ('nickname_uniq', 'unique (nickname)', 'The nickname must be unique!'),]
 _PER_ESP = [('','')]
 
-class res_partner(models.Model):
-	_name = 'res.partner'
-	_inherit = 'res.partner'
+class medical_staff(models.Model):
+	_name = 'hr.employee'
+	_inherit = 'hr.employee'
 
 	@api.onchange('profession')
 	def _onchange_profession(self):
@@ -174,8 +175,10 @@ class res_partner(models.Model):
 		if self.name:
 			self.name = self.name.title().strip() 
 	
+	profession_ids = fields.Many2many('profession', string="Professions")
+	specialization_ids = fields.Many2many('specialization', string="Specializations")
+	schedule_ids = fields.Many2many('resource.calendar.attendance', string="Attention Schedule")
 	user_id = fields.Many2one('res.users', 'User', ondelete="restrict")
-	#active = fields.Boolean(string='Active',default=True)
 
 	_order = 'name'
 	_sql_constraints = [('name_uniq','unique(name)', 'The name must be unique!')]
@@ -208,4 +211,47 @@ class specialization(models.Model):
 	active = fields.Boolean(string='Active',default=True)
 	
 	_order = 'name'
-	_sql_constraints = [('name_uniq','unique(name)', 'The name must be unique!')]	
+	_sql_constraints = [('name_uniq','unique(name)', 'The name must be unique!')]
+
+class medical_diagnostic_impression(models.Model):
+	
+	_name = 'medical.diagnostic.impression'
+	
+	@api.onchange('name')
+	def _onchange_name(self):
+		if self.name:
+			self.name = self.name.upper().strip()
+
+	name = fields.Char(string='name', size=10)
+	description = fields.Char('Description', size=120)
+	active = fields.Boolean('Active', default=True)
+
+	_order = 'name'
+	_sql_constraints = [('name_uniq','unique(name)', 'The name must be unique!')]
+
+class medical_activity_type(models.Model):
+	_name = 'medical.activity.type'
+	
+	name = fields.Char(string='Short Name', size=10)
+	description = fields.Char(string='Description', size=120)
+	active = fields.Boolean('Active', default=True)
+	service_type = fields.Selection([('preventive', 'Preventive'), ('curative', 'Curative')], 'Service Type')
+	type_medical_service = fields.Selection([('occupational', 'Occupational'), ('integral', 'Integral')],'Type Medical Service')
+
+	@api.constrains('name')
+	def _check_name(self, cr, uid, ids,context=None):
+		if context is None:
+			context = {}
+		for rec in self.browse(cr, uid, ids, context=context):
+			cr.execute("SELECT id FROM type_activity WHERE id != %d AND lower(trim(name)) = lower(trim('%s'))" %(rec.id, rec.name,))
+			if len(cr.fetchall())>0:
+				raise ValidationError("The short name must be unique!")
+    
+	@api.constrains('name')
+	def _check_description(self, cr, uid, ids,context=None):
+		if context is None:
+			context = {}
+		for rec in self.browse(cr, uid, ids, context=context):
+			cr.execute("SELECT id FROM type_activity WHERE id != %d AND lower(trim(description)) = lower(trim('%s'))" %(rec.id, rec.description,))
+			if len(cr.fetchall())>0:
+				raise ValidationError("The description must be unique!")

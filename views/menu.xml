@@ -2,14 +2,22 @@
 <openerp>
 	<data>
     <menuitem name ="Medical Management" id="medical_management_root_menu"/>
+
     <menuitem name ="Configuration" parent="medical_management_root_menu" id="medical_management_configuracion_menu"/>
-    <menuitem name ="Types Body Systems" parent="medical_management_configuracion_menu" id="type_body_systems_menu" action="type_body_system_action"/>
-    <menuitem name ="Body Parts" parent="medical_management_configuracion_menu" id="body_part_menu"  action="body_part_action"/>
-    <menuitem name ="Types of Diseases" parent="medical_management_configuracion_menu" id="type_disease_menu" action="type_disease_action" />
-	<menuitem name ="Diseases" parent="medical_management_configuracion_menu" id="disease_menu"  action="disease_action" />
-    <menuitem name ="Types Medical Appointments" parent="medical_management_configuracion_menu" id="type_medical_appointment_menu" action="type_medical_appointment_action"/>
-    <menuitem name ="Nursing Services" parent="medical_management_configuracion_menu" id="nursing_service_menu"  action="nursing_service_action" />
-    <menuitem name ="Medical Specializations" parent="medical_management_configuracion_menu" id="specialization_menu"  action="specialization_action"/>
-    <menuitem name ="Medical Staff" parent="medical_management_configuracion_menu" id="medical_staff_menu"  action="medical_staff_action" />
+
+    <menuitem name ="Medical Staff" parent="medical_management_configuracion_menu" id="medical_staff_menu" action="medical_staff_action" sequence="1"/>
+    <menuitem name ="Professions" parent="medical_management_configuracion_menu" id="profession_menu" action="profession_action" sequence="2"/>
+    <menuitem name ="Specializations" parent="medical_management_configuracion_menu" id="specialization_menu" action="specialization_action" sequence="3"/>
+    <menuitem name ="Types Medical Appointments" parent="medical_management_configuracion_menu" id="medical_appointment_type_menu" action="medical_appointment_type_action" sequence="4"/>
+    <menuitem name ="Nursing Services" parent="medical_management_configuracion_menu" id="medical_nursing_service_menu" action="medical_nursing_service_action" sequence="5"/>
+	<menuitem name ="Type Activities" parent="medical_management_configuracion_menu" id="medical_activity_type_menu" action="medical_activity_type_action" sequence="6"/>
+    <menuitem name ="Diagnostic Impression" parent="medical_management_configuracion_menu" id="diagnostic_impression_menu" action="medical_diagnostic_impression_action" sequence="7"/>
+    <menuitem name ="Types of Diseases" parent="medical_management_configuracion_menu" id="medical_disease_type_menu" action="medical_disease_type_action" sequence="8"/>
+	<menuitem name ="Diseases" parent="medical_management_configuracion_menu" id="disease_menu" action="medical_disease_action" sequence="9"/>
+    <menuitem name ="Types Body Systems" parent="medical_management_configuracion_menu" id="medical_body_system_type_menu" action="medical_body_system_type_action" sequence="10"/>
+    <menuitem name ="Body Parts" parent="medical_management_configuracion_menu" id="medical_body_part_menu" action="medical_body_part_action" sequence="11"/>  
+    
+    
+    
     </data>
 </openerp>

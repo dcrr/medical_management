@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-
-	<!-- Views and action for type_body_system -->
-        <record model="ir.ui.view" id="type_body_system_tree_view">
-            <field name="name">type.body.system.tree.view</field>
-            <field name="model">type.body.system</field>
+	<!-- Views and action for medical_body_system_type -->
+        <record model="ir.ui.view" id="medical_body_system_type_tree_view">
+            <field name="name">medical.body.system.type.tree.view</field>
+            <field name="model">medical.body.system.type</field>
 			<field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Type Body Systems">
@@ -16,42 +15,42 @@
                 </tree>
             </field>
         </record>
-		<record model="ir.ui.view" id="type_body_system_form_view">
-            <field name="name">type.body.system.form.view</field>
-            <field name="model">type.body.system</field>
+	 	<record model="ir.ui.view" id="medical_body_system_type_form_view">
+            <field name="name">medical.body.system.type.form.view</field>
+            <field name="model">medical.body.system.type</field>
 			<field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Type Body System">
 					<sheet string="Type Body System">
 						<div class="oe_title">
 							<h1>
-								<field name="nickname" nolabel="1" placeholder="Nickname" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}"/>
+								<field name="nickname" nolabel="1" placeholder="Nickname" attrs="{'readonly':['|',('system_ids','!=',[]),('body_part_ids','!=',[]) ]}"/>
 							</h1>
 						</div>
 						<group>
 							<field name="system_ids" attrs="{'invisible':True}"/>
-						    <field name="bodypart_ids" attrs="{'invisible':True}"/>					    
-						    <field name="type" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}" />
-							<field name="name" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}" />							
+						    <field name="body_part_ids" attrs="{'invisible':True}"/>					    
+						    <field name="type" attrs="{'readonly':['|',('system_ids','!=',[]),('body_part_ids','!=',[]) ]}" />
+							<field name="name" attrs="{'readonly':['|',('system_ids','!=',[]),('body_part_ids','!=',[]) ]}" />							
 							<separator colspan="2"/>
-							<label colspan="2" string="For records associated with other records!" attrs="{'invisible':[('system_ids','=',[]),('bodypart_ids','=',[])]}"/> 
-							<field name="active" attrs="{'readonly':['|',('system_ids','!=',[]),('bodypart_ids','!=',[]) ]}" />
+							<label colspan="2" string="For records associated with other records!" attrs="{'invisible':[('system_ids','=',[]),('body_part_ids','=',[])]}"/> 
+							<field name="active" attrs="{'readonly':['|',('system_ids','!=',[]),('body_part_ids','!=',[]) ]}" />
 						</group>		
 					</sheet>
    				</form>
             </field>
         </record>
-        <record model="ir.actions.act_window" id="type_body_system_action">
+        <record model="ir.actions.act_window" id="medical_body_system_type_action">
             <field name="name">Type Body Systems</field>
-            <field name="res_model">type.body.system</field>
+            <field name="res_model">medical.body.system.type</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
         </record>
 
-	<!-- Views and action for body_part -->
-		<record model="ir.ui.view" id="body_part_tree_view">
-            <field name="name">body.part.tree.view</field>
-            <field name="model">body.part</field>
+	<!-- Views and action for medical_body_part -->
+		<record model="ir.ui.view" id="medical_body_part_tree_view">
+            <field name="name">medical.body.part.tree.view</field>
+            <field name="model">medical.body.part</field>
 			<field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Body Parts" version="7.0">
@@ -64,9 +63,9 @@
                 </tree>
             </field>
         </record>
-		<record model="ir.ui.view" id="body_part_form_view">
-            <field name="name">body.part.form.view</field>
-            <field name="model">body.part</field>
+		<record model="ir.ui.view" id="medical_body_part_form_view">
+            <field name="name">medical.body.part.form.view</field>
+            <field name="model">medical.body.part</field>
 			<field name="type">form</field>
             <field name="arch" type="xml">   
                 <form string="Body Parts" version="7.0">
@@ -89,25 +88,25 @@
    				</form>
             </field>
         </record> 
-		<record model="ir.actions.act_window" id="body_part_action">
+		<record model="ir.actions.act_window" id="medical_body_part_action">
             <field name="name">Body Parts</field>
-            <field name="res_model">body.part</field>
+            <field name="res_model">medical.body.part</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>            
         </record>
 
-	<!-- Views and action for type.disease -->
-		<record model="ir.actions.act_window" id="disease_by_type_action">
+	<!-- Views and action for medical_type_disease -->
+		<record model="ir.actions.act_window" id="medical_disease_by_type_action">
             <field name="name">Diseases By Type</field>
-			<field name="res_model">disease</field> 			
+			<field name="res_model">medical.disease</field> 			
 			<field name="domain">[('type_disease_id', '=', [active_id])]</field> 
 			<field name="view_type">tree</field>
 			<field name="view_mode">tree,form</field>   
 			<field name="target">new</field>
 		</record>
-		<record model="ir.ui.view" id="type_disease_form_view">
-            <field name="name">type.disease.form.view</field>
-            <field name="model">type.disease</field>
+		<record model="ir.ui.view" id="medical_disease_type_form_view">
+            <field name="name">medical.disease.type.form.view</field>
+            <field name="model">medical.disease.type</field>
 			<field name="type">form</field>
             <field name="arch" type="xml">   
                 <form string="Type of Disease">
@@ -118,7 +117,7 @@
 							</h1>
 						</div>
 						<div class="oe_right oe_button_box" name="buttons" >
-							<button name="%(disease_by_type_action)d" string="Diseases" type="action" attrs="{'invisible':[('enfermedad_ids','=',[])]}" />
+							<button name="%(medical_disease_by_type_action)d" string="Diseases" type="action" attrs="{'invisible':[('enfermedad_ids','=',[])]}" />
 						</div>
 						<group>
 						    <field name="enfermedad_ids" attrs="{'invisible':True}" />
@@ -131,9 +130,9 @@
    				</form>
             </field>
         </record>
-		<record model="ir.ui.view" id="type_disease_tree_view">
-            <field name="name">type.disease.tree.view</field>
-            <field name="model">type.disease</field>
+		<record model="ir.ui.view" id="medical_disease_type_tree_view">
+            <field name="name">medical.disease.type.tree.view</field>
+            <field name="model">medical.disease.type</field>
 			<field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Type of Disease">
@@ -143,17 +142,17 @@
                 </tree>
             </field>
         </record>		
-		<record model="ir.actions.act_window" id="type_disease_action">
+		<record model="ir.actions.act_window" id="medical_disease_type_action">
             <field name="name">Types of Diseases</field>
-            <field name="res_model">type.disease</field>
+            <field name="res_model">medical.disease.type</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>            
         </record>
 
-	<!-- Views and action for disease -->
-		<record model="ir.ui.view" id="disease_form_view">
-            <field name="name">disease.form.view</field>
-            <field name="model">disease</field>
+	<!-- Views and action for medical_disease -->
+		<record model="ir.ui.view" id="medical_disease_form_view">
+            <field name="name">medical.disease.form.view</field>
+            <field name="model">medical.disease</field>
 			<field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Diseases">
@@ -164,7 +163,7 @@
 							</h1>
 						</div>
 						<group>
-							<field name="type_disease_id" />
+							<field name="disease_type_id" />
 						    <field name="name" />
 							<field name="active"/>	
 						</group>						
@@ -172,26 +171,26 @@
    				</form>
             </field>
         </record>	
-		<record model="ir.ui.view" id="disease_tree_view">
-            <field name="name">disease.tree.view</field>
-            <field name="model">disease</field>
+		<record model="ir.ui.view" id="medical_disease_tree_view">
+            <field name="name">medical.disease.tree.view</field>
+            <field name="model">medical.disease</field>
 			<field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Diseases " version="7.0">
 					<field name="name" select="1"/>
 					<field name="nickname"/> 
-					<field name="type_disease_id"/>
+					<field name="disease_type_id"/>
 					<field name="active"/>	
                 </tree>
             </field>
         </record>
-		<record model="ir.ui.view" id="disease_search_view">
-            <field name="name">disease.search.view</field>
-            <field name="model">disease</field>
+		<record model="ir.ui.view" id="medical_disease_search_view">
+            <field name="name">medical.disease.search.view</field>
+            <field name="model">medical.disease</field>
             <field name="arch" type="xml">
                <search string="Diseases"> 
                     <field name="name" string="Disease" />
-					<field name="type_disease_id" string="Type"/> 
+					<field name="disease_type_id" string="Type"/> 
                     <separator/>
 						<filter string="Activas" name="enfermedad_activa" domain="[('active','=',True)]"/>
 						<filter string="Inactivas" name="enfermedad_inactiva" domain="[('active','=',False)]"/>
@@ -202,19 +201,19 @@
                 </search>
             </field>
         </record> 
-		<record model="ir.actions.act_window" id="disease_action">
+		<record model="ir.actions.act_window" id="medical_disease_action">
             <field name="name">Diseases</field>
-            <field name="res_model">disease</field>
+            <field name="res_model">medical.disease</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>     
 			<!-- Filtros de la vista enfermedad -->	
-			<field name="search_view_id" ref="disease_search_view"/> 	
+			<field name="search_view_id" ref="medical_disease_search_view"/> 	
         </record>
 
-	<!-- Views and action for type_medical_appointment  -->
-		<record model="ir.ui.view" id="type_medical_appointment_form_view">
-            <field name="name">type.medical.appointment.form.view</field>
-            <field name="model">type.medical.appointment</field>
+	<!-- Views and action for medical_appointment_type -->
+		<record model="ir.ui.view" id="medical_appointment_type_form_view">
+            <field name="name">medical.appointment.type.form.view</field>
+            <field name="model">medical.appointment.type</field>
 			<field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Types of Medical Appointments">
@@ -233,9 +232,9 @@
    				</form>
             </field>
         </record>
-		<record model="ir.ui.view" id="type_medical_appointment_tree_view">
-            <field name="name">type.medical.appointment.tree.view</field>
-            <field name="model">type.medical.appointment</field>
+		<record model="ir.ui.view" id="medical_appointment_type_tree_view">
+            <field name="name">medical.appointment.type.tree.view</field>
+            <field name="model">medical.appointment.type</field>
 			<field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Types of Medical Appointments">
@@ -246,17 +245,17 @@
                 </tree>
             </field>
         </record>
-		<record model="ir.actions.act_window" id="type_medical_appointment_action">
+		<record model="ir.actions.act_window" id="medical_appointment_type_action">
             <field name="name">Types of Medical Appointments</field>
-			<field name="res_model">type.medical.appointment</field>
+			<field name="res_model">medical.appointment.type</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>    
         </record>
 	
-	<!-- Views and action for nursing_service  -->
-		<record model="ir.ui.view" id="nursing_service_form_view">
-            <field name="name">nursing.service.form.view</field>
-            <field name="model">nursing.service</field>
+	<!-- Views and action for medical_nursing_service -->
+		<record model="ir.ui.view" id="medical_nursing_service_form_view">
+            <field name="name">medical.nursing.service.form.view</field>
+            <field name="model">medical.nursing.service</field>
 			<field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Nursing Services">
@@ -279,9 +278,9 @@
    				</form>
             </field>
         </record>
-		<record model="ir.ui.view" id="nursing_service_tree_view">
-            <field name="name">nursing.service.tree.view</field>
-            <field name="model">nursing.service</field>
+		<record model="ir.ui.view" id="medical_nursing_service_tree_view">
+            <field name="name">medical.nursing.service.tree.view</field>
+            <field name="model">medical.nursing.service</field>
 			<field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Nursing Services" version="7.0">
@@ -292,35 +291,55 @@
                 </tree>
             </field>
         </record>
-		<record model="ir.actions.act_window" id="nursing_service_action">
+		<record model="ir.actions.act_window" id="medical_nursing_service_action">
             <field name="name">Nursing Services</field>
-			<field name="res_model">nursing.service</field>
+			<field name="res_model">medical.nursing.service</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>    
         </record>
 	
-	<!-- Views and action for medical staff (res_partner)  -->
+	<!-- Views and action for medical staff (res_partner) -->
 		<record model="ir.ui.view" id="medical_staff_form_view">
             <field name="name">medical.staff.form.view</field>
-            <field name="model">res.partner</field>
+            <field name="model">hr.employee</field>
 			<field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Medical Staff" version="7.0">
 					<sheet string="Medical Staff">
-						<group>  
-						    <field name="name" select="1" />
-							<field name="user_id" widget="selection"/>
-							<separator colspan="2"/>
-							<label colspan="2" string="For records associated with other records!"/>
-							<field name="active"/>
-						</group>						
+						<div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                            <label for="profession_ids" class="oe_edit_only"/>
+                            <field name="profession_ids" widget="many2many_tags" placeholder="Doctor"/>
+							<label for="specialization_ids" class="oe_edit_only"/>
+                            <field name="specialization_ids" widget="many2many_tags" placeholder="Cardiologist"/>
+                        </div>	
+						<notebook>
+                            <page string="Contact Information">
+                                <group>
+                                    <field name="mobile_phone"/>
+                                    <field name="work_location"/>
+									<field name="user_id" widget="selection"/>
+									<separator colspan="2"/>
+									<label colspan="2" string="For records associated with other records!"/>
+									<field name="active"/>
+                                </group>
+                            </page>
+							<page string="Schedule">
+                                <group>
+								<field name="schedule_ids"/>
+                                </group>
+                            </page>			
+						</notebook>
 					</sheet>
    				</form>
             </field>
         </record>
 		<record model="ir.ui.view" id="medical_staff_tree_view">
             <field name="name">medical.staff.tree.view</field>
-            <field name="model">res.partner</field>
+            <field name="model">hr.employee</field>
 			<field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Medical Staff">
@@ -332,7 +351,7 @@
         </record>
 		<record model="ir.actions.act_window" id="medical_staff_action">
             <field name="name">Medical Staff</field>
-			<field name="res_model">res.partner</field>
+			<field name="res_model">hr.employee</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>    
         </record>	
@@ -351,7 +370,7 @@
             <field name="act_window_id" ref="medical_staff_action"/>
         </record>
 
-	<!-- Views and action for specialization  -->
+	<!-- Views and action for specialization -->
 		<record model="ir.ui.view" id="specialization_tree_view">
             <field name="name">specialization.tree.view</field>
             <field name="model">specialization</field>
@@ -370,8 +389,12 @@
             <field name="arch" type="xml">
                 <form string="Specializations">
 					<sheet string="Specializations">
+						<div class="oe_title">
+							<h1>
+								<field name="name" nolabel="1" placeholder="Name" required="1"/>
+							</h1>
+						</div>	
 						<group>
-							<field name="name"/>
 							<separator colspan="2"/>
 							<label colspan="2" string="For records associated with other records!"/> <!-- attrs="{'invisible':[('staff_ids','=',[])]}"-->
 							<field name="active"/>
@@ -386,5 +409,141 @@
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>   
         </record>
-	</data> 
+
+	<!-- Views and action for profession -->
+		<record model="ir.ui.view" id="profession_tree_view">
+            <field name="name">profession.tree.view</field>
+            <field name="model">profession</field>
+			<field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Professions">
+                    <field name="name" />
+					<field name="active"/>        															
+				</tree>
+            </field>
+        </record>
+		<record model="ir.ui.view" id="profession_form_view">
+            <field name="name">profession.form.view</field>
+            <field name="model">profession</field>
+			<field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Professions">
+					<sheet string="Professions">
+						<div class="oe_title">
+							<h1>
+								<field name="name" nolabel="1" placeholder="Name" required="1"/>
+							</h1>
+						</div>	
+						<group>
+							<separator colspan="2"/>
+							<label colspan="2" string="For records associated with other records!"/> <!-- attrs="{'invisible':[('staff_ids','=',[])]}"-->
+							<field name="active"/>
+						</group>						
+					</sheet>
+   				</form>
+            </field>
+        </record>
+		<record model="ir.actions.act_window" id="profession_action">
+            <field name="name">profession</field>
+			<field name="res_model">profession</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>   
+        </record>
+
+	<!-- Views and action for medical_diagnostic_impression -->
+		<record model="ir.ui.view" id="medical_diagnostic_impression_form_view">
+	     	<field name="name">medical.diagnostic.impression.form.view</field>
+	        <field name="model">medical.diagnostic.impression</field>
+			<field name="type">form</field>
+	        <field name="arch" type="xml">
+	        	<form string="Diagnostic Impression">
+					<sheet string="Diagnostic Impression">
+						<div class="oe_title">
+							<h1>
+								<field name="name" nolabel="1" placeholder="Name" required="1"/>
+							</h1>
+						</div>		
+						<group col="2">
+						<field name="name" required="1"/>
+						<field name="description"/>
+						<field name="active"/>
+						</group>
+					</sheet>					
+	          	</form>
+	     	</field>
+     	</record>
+		<record model="ir.ui.view" id="medical_diagnostic_impression_search_view">
+	    	<field name="name">medical.diagnostic.impression.search.view</field>
+	        <field name="model">medical.diagnostic.impression</field>
+	        <field name="arch" type="xml">
+	        	<search string="Diagnostic Impression">
+	        		<field name="name"/>
+	        		<field name="description"/>
+	        		<field name="active"/>
+	        	</search>
+	        </field>
+		</record>
+	 	<record model="ir.ui.view" id="medical_diagnostic_impression_tree_view">
+            <field name="name">medical.diagnostic.impression.tree.view</field>
+            <field name="model">medical.diagnostic.impression</field>
+			<field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree string="Diagnostic Impression" version="7.0">
+					<field name="name"/>
+					<field name="description"/>
+					<field name="active"/>	
+                </tree>
+            </field>
+     	</record>
+		<record model="ir.actions.act_window" id="medical_diagnostic_impression_action">
+	        <field name="name">Diagnostic Impression</field>
+	        <field name="res_model">medical.diagnostic.impression</field>	        
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+		</record> 
+		
+	<!-- Views and action for medical_activity_type -->
+		<record model="ir.ui.view" id="medical_activity_type_form_view">
+	     	<field name="name">medical.activity.type.form.view</field>
+	        <field name="model">medical.activity.type</field>
+			<field name="type">form</field>
+	        <field name="arch" type="xml">
+	        	<form string="Type Activity">
+					<sheet string="Type Activity">
+						<div class="oe_title">
+							<h1>
+								<field name="name" nolabel="1" placeholder="Name" required="1"/>
+							</h1>
+						</div>	
+						<group col="2">
+							<field name="service_type"/>
+							<field name="type_medical_service"/>
+							<field name="description"/>
+							<field name="active"/>
+						</group>
+					</sheet>					
+	          	</form>
+	     	</field>
+     	</record>
+	 	<record model="ir.ui.view" id="medical_activity_type_tree_view">
+            <field name="name">medical.activity.type.tree.view</field>
+            <field name="model">medical.activity.type</field>
+			<field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree string="Activity">
+            		<field name="name"/>
+            		<field name="description"/>
+					<field name="service_type"/>
+					<field name="type_medical_service"/>
+					<field name="active"/>
+                </tree>
+            </field>
+     	</record>
+	 	<record model="ir.actions.act_window" id="medical_activity_type_action">
+	        <field name="name">Type of Activity</field>
+	        <field name="res_model">medical.activity.type</field>	        
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form</field>
+		</record> 
+	</data>
 </openerp>
