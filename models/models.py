@@ -55,7 +55,7 @@ class medical_body_part(models.Model):
 	_sql_constraints = [
         ('name_uniq', 'unique (name)', 'The description must be unique!'),
         ('nickname_uniq', 'unique (nickname)', 'The nickname must be unique!'),]
-	
+
 # Type of disease
 class medical_disease_type(models.Model):
 	_name = "medical.disease.type" 
@@ -255,3 +255,41 @@ class medical_activity_type(models.Model):
 			cr.execute("SELECT id FROM type_activity WHERE id != %d AND lower(trim(description)) = lower(trim('%s'))" %(rec.id, rec.description,))
 			if len(cr.fetchall())>0:
 				raise ValidationError("The description must be unique!")
+
+class medical_analysis_type(models.Model):	
+	_name = 'medical.analysis.type'
+	
+	name = fields.Char(string='Name', size=120)
+	description = fields.Text('Description')
+	analysis_group_ids = fields.One2many('medical.analysis.group', 'analysis_type_id','Groups', ondelete='restrict')
+
+class medical_analysis_group(models.Model):
+	_name = 'medical.analysis.group'
+	
+	name = fields.Char(string='Name', size=120)
+	description = fields.Text('Description')
+	analysis_type_id = fields.Many2one('medical.analysis.type', 'Type', ondelete="restrict")
+
+class medical_analysis_details(models.Model):
+	_name = 'medical.analysis.details'
+	
+	name = fields.Char(string='Name', size=120)
+	description = fields.Text('Description')
+	
+
+class medical_template_analysis(models.Model):
+	_name = 'medical.template.analysis'
+	
+	def _get_name(self):
+		for rec in self:
+			rec.name = rec.type_id.name+'/'+rec.group_id.name+'/'+rec.analysis_id.name
+			if rec.details_id:
+				rec.name = rec.name+'/'+rec.details_id.name
+
+	name = fields.Char(compute='_get_name', method=True,string='Name', 
+						store={'medical.template.analysis':(lambda  self:['group_id','type_id','analysis_id','details_id'] , 10)})
+	group_id = fields.Many2one('medical.analysis.group', 'Group', ondelete="restrict")
+	type_id = fields.Many2one(related='group_id.analysis_type_id', string='Type', relation='medical.analysis.type', store=True, ondelete="restrict")
+	analysis_id = fields.Many2one('medical.analysis', 'Medical Analysis', ondelete="restrict")
+	details_id = fields.Many2one('medical.analysis.details', 'Details', ondelete="restrict")
+	

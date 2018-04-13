@@ -46,6 +46,17 @@ class medical_patient_service(models.Model):
 	# 		result.update({'value': {'range':'', 'min_range':'', 'normal_range':'','max_range':''} })
 	# 	return result
 
+class medical_body_area(models.Model):
+	_name = "medical.body.area"
+	
+	body_system_type_id = fields.Many2one('medical.body.system.type', 'Type of System', ondelete="restrict")
+	body_part_id = fields.Many2one('medical.body.part', 'Body Part', ondelete="restrict")
+	on_left = fields.Boolean(string='On Left')
+	on_right = fields.Boolean(string='On Right')
+	on_both = fields.Boolean(string='On Both')
+	remark = fields.Char('Remark',size=650)
+	medical_appointment_id = fields.Many2one('medical.appointment', 'Medical Appointment')
+
 class medical_appointment(models.Model):
     _name = 'medical.appointment'
     
@@ -111,7 +122,7 @@ class medical_appointment(models.Model):
     prescription = fields.Text(string='Prescription', size=120)
     prescription_indications = fields.Text(string='Indications', size=120)
     patient_disease_ids = fields.One2many('medical.patient.disease', 'medical_appointment_id','Diseases',domain=['|',('active','=',False),('active','=',True)])
-    # body_area_affected_ids = fields.one2many('body.area', 'medical_appointment_id','Body Area Affected')
+    body_area_affected_ids = fields.one2many('medical.body.area', 'medical_appointment_id','Body Area Affected')
     patient_service_ids = fields.One2many('medical.patient.service', 'medical_appointment_id','Patient Services')
     # clinical_analysis_ids = fields.one2many('medical.appointment.clinical.analysis', 'medical_appointment_id','Clinical Analysis')
     # template_clinical_analysis_ids = fields.many2many('template.clinical.analysis', 'medical_appointment_clinical_analysis','medical_appointment_id','template_clinical_analysis_id','Templates')
