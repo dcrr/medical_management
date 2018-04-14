@@ -3,7 +3,12 @@
 	<data>
     <menuitem name ="Medical Management" id="medical_management_root_menu"/>
 
-    <menuitem name ="Configuration" parent="medical_management_root_menu" id="medical_management_configuracion_menu"/>
+    <menuitem name ="Services" parent="medical_management_root_menu" id="medical_management_service_menu"  sequence="1"/>
+
+    <menuitem name ="Schedule Appointment" parent="medical_management_service_menu" id="medical_chedule_appointment_menu" action="medical_appointment_calendar_action" sequence="1"/>
+    <menuitem name ="Medical Appointment" parent="medical_management_service_menu" id="medical_appointment_menu" action="medical_appointment_action" sequence="2"/>
+
+    <menuitem name ="Configuration" parent="medical_management_root_menu" id="medical_management_configuracion_menu"  sequence="2"/>
 
     <menuitem name ="Medical Staff" parent="medical_management_configuracion_menu" id="medical_staff_menu" action="medical_staff_action" sequence="1"/>
     <menuitem name ="Professions" parent="medical_management_configuracion_menu" id="profession_menu" action="profession_action" sequence="2"/>

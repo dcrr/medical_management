@@ -1,6 +1,324 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+	<!-- Views and action for medical_appointment -->
+		<record model="ir.ui.view" id="medical_appointment_calendar_view">
+            <field name="name">Medical Appointment</field>
+            <field name="model">medical.appointment</field>
+            <field name="arch" type="xml">
+                <calendar string="Appointment" color="state" day_length="24" date_start="appointment_date">
+                    <field name="patient_id"/>
+                </calendar>
+            </field>
+        </record>  		
+		<record model="ir.ui.view" id="medical_patient_tree_view">
+            <field name="name">Patient</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <tree string="Patient">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="medical_patient_search_view">
+		    <field name="name">medical.patient.search.view</field>
+		    <field name="model">res.partner</field>
+		    <field name="arch" type="xml">
+		    	<search string="Search">
+		        	<field name="name" string="name"/>
+	        	</search>
+		    </field>
+		</record> 
+		<record model="ir.ui.view" id="medical_appointment_kanban_view">
+			<field name="name">medical.appointment.kanban.view</field>
+			<field name="model">medical.appointment</field>
+			<field name="arch" type="xml">
+	        <kanban create="false" default_group_by="state">
+	               <field name="color"/>
+	               <templates>
+	                    <t t-name="kanban-box">
+	                        <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_global_click_edit oe_semantic_html_override oe_kanban_card #{record.group_fancy==1 ? 'oe_kanban_card_fancy':''}">
+	                            <div class="oe_dropdown_kanban">
+	                                <div class="oe_dropdown_toggle">
+	                                    <span class="oe_e">#</span>
+	                                    <ul class="oe_dropdown_menu">
+	                                        <li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
+	                                    </ul>
+	                                </div>
+	                                <div class="oe_clear"></div>
+	                            </div>
+	                            <div t-attf-class="oe_kanban_content">
+				                    <field name="patient_name"/><br/>
+				                    <field name="appointment_date"/>
+	                            </div>
+	                        </div>
+	                    </t>
+	                </templates>
+	            </kanban>
+        	</field>
+    	</record>
+		<record model="ir.ui.view" id="medical_appointment_form_view1">
+            <field name="name">medical.appointment.form.view1</field>
+            <field name="model">medical.appointment</field>
+			<field name="type">form</field>
+            <field name="arch" type="xml">   
+                <form string="Medical Appointment" version="7.0">
+               		<header>
+	            		<button string="Scheduled" class="oe_highlight"  name="scheduled" states="waiting" type="workflow" icon="terp-go-month"/>
+	            		<button string="Waiting" class="oe_highlight" name="waiting" states="scheduled,in_attention" type="workflow" icon="terp-project"/>
+	            		<button string="Annulled" class="oe_highlight" name="annulled" states="scheduled,waiting" type="workflow" icon="gtk-stop"/>
+		                <field name="state" widget="statusbar"/>
+		            </header>	
+					<sheet string="Medical Appointment">
+						<div class="oe_title">
+							<h1>
+								<field name="name" placeholder="Code"/>
+							</h1>
+						</div>
+						<group col="2">
+							<field name="patient_id" attrs="{'readonly':[('state','in',['in_attention','attended','annulled'])]}" options="{'no_open': True,'create_edit': false}" context="{'tree_view_ref':'medical_patient_tree_view', 'search_view_ref':'medical_patient_search_view'}"/>
+							<field name="rescheduled"/>
+							<field name="appointment_date" attrs="{'readonly':[('state','in',['in_attention','attended','annulled'])]}" />
+							<field name="postpone" attrs="{'readonly':[('state','in',['in_attention','attended','annulled'])]}"/> 
+							<field name="assigned_by"/>
+							<field name="appointmet_type_id" required="1" options="{'no_open': True,'create_edit': false}" attrs="{'readonly':[('state','in',['in_attention','attended','annulled'])]}"/>
+							<field name="waiting_date" attrs="{'readonly':['|',('state','in',['in_attention','attended','annulled']),('postpone','=',False)]}"/>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record model="ir.actions.act_window" id="medical_appointment_calendar_action">
+	        <field name="name">Medical Appointment</field>
+	        <field name="res_model">medical.appointment</field>	        
+	        <field name="view_type">form</field>
+	        <field name="domain">[('state','in',['scheduled','waiting','in_attention'])]</field>
+	        <field name="view_mode">calendar,kanban</field>
+	    </record>
+		<record model="ir.actions.act_window.view" id="medical_appointment_action_view1">
+	        <field name="act_window_id" ref="medical_appointment_calendar_action"/>
+	        <field name="sequence" eval="1"/>
+	        <field name="view_mode">calendar</field>
+	        <field name="view_id" ref="medical_appointment_calendar_view"/>
+    	</record>   	
+    	<record model="ir.actions.act_window.view" id="medical_appointment_action_view2">
+	        <field name="act_window_id" ref="medical_appointment_calendar_action"/>
+	        <field name="sequence" eval="2"/>
+	        <field name="view_mode">form</field>
+	        <field name="view_id" ref="medical_appointment_form_view1"/>
+    	</record>
+		<record model="ir.ui.view" id="medical_appointment_search_view1">
+	    	<field name="name">medical.appointment.search.view1</field>
+	        <field name="model">medical.appointment</field>
+	        <field name="arch" type="xml">
+	        	<search string="Medical Appointment">
+	        		<field name="name"/>
+	        		<field name="patient_id"/>
+	        		<field name="appointmet_type_id"/>
+	        		<field name="appointment_date"/>
+	        		<field name="attention_date" string="Desde Fecha Atención" filter_domain="[('attention_date','>=',self)]"/>
+	        		<field name="attention_date" string="Hasta Fecha Atención" filter_domain="[('attention_date','&lt;=',self)]"/>
+					<!-- <field name="employee_department"/> -->
+					<field name="waiting_date"/>
+					<field name="doctor_id" />
+					<field string="Area Afectada" name="body_area_affected_ids" />
+					<field string="Enfermedad" name="patient_disease_ids"/>
+					<field name="patient_service_ids"/>
+					<field name="state"/>
+	        		<filter string="Trabajadores" name="employee_id" domain="[('foreign_patient','=',False)]" />
+	        		<filter string="Foraneos" name="employee_id" domain="[('foreign_patient','=',True)]" />
+	        		<separate />
+	        		<filter string="Scheduled" name="scheduled" domain="[('state','=','scheduled')]"/>
+	        		<filter string="Waiting" name="waiting" domain="[('state','=','waiting')]"/>
+	        		<filter string="In Attention" name="in_attention" domain="[('state','=','in_attention')]"/>
+	        		<filter string="Attended" name="attended" domain="[('state','=','attended')]"/>
+	        		<filter string="Annulled" name="annulled" domain="[('state','=','annulled')]"/>
+	        		<separate />
+	        		<filter string="Preventivas" name="type_medical_appointmet_id" domain="[('appointmet_type_id.category','like','preventive')]"/>
+	        		<filter string="Curativas" name="type_medical_appointmet_id" domain="[('appointmet_type_id.category','like','curative')]"/>
+	        		<group expand="0" string="Agrupado Por...">
+                        <filter string="Paciente" name="employee_id" context="{'group_by': 'employee_id'}"/>
+                        <!-- <filter string="Departamento" name="employee_department" context="{'group_by': 'employee_department'}"/> -->
+                        <filter string="Tipo de Consulta" name="type_medical_appointmet_id" context="{'group_by': 'appointmet_type_id'}"/>
+                        <filter string="Médico" name="doctor" context="{'group_by': 'doctor'}"/>
+                        <filter string="Categoría" name="appointmet_type_id" context="{'group_by': 'type_consult'}" />
+                        <filter string="Año Atención" name="attention_date" context="{'group_by': 'attention_date:year'}"/>
+                        <filter string="Mes Atención" name="attention_date" context="{'group_by': 'attention_date:month'}"/>
+                        <filter string="Día Atención" name="attention_date" context="{'group_by': 'attention_date:day'}" />
+					</group>	
+	        	</search>
+	        </field>
+		</record>
+		<record model="ir.ui.view" id="medical_appointment_tree_view1">
+            <field name="name">medical.appointment.tree.view1</field>
+            <field name="model">medical.appointment</field>
+			<field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Medical Appointment">
+					<field name="patient_id"/> 
+					<field name="appointmet_type_id"/>
+					<field name="appointment_date"/>
+					<field name="waiting_date"/>
+					<field name="state"/>						
+                </tree>
+            </field>
+        </record>
+		<record model="ir.ui.view" id="medical_appointment_form_view2">
+            <field name="name">medical.appointment.form.view2</field>
+            <field name="model">medical.appointment</field>
+			<field name="type">form</field>
+            <field name="arch" type="xml">   
+                <form string="Medical Appointment" version="7.0">
+                	<header>
+	            		<button string="Scheduled" name="scheduled" states="waiting" type="workflow" icon="terp-go-today"/>
+	            		<button string="Waiting" name="waiting" states="scheduled,in_attention" type="workflow" icon="terp-project"/>
+	            		<button string="In Attention" name="in_attention" states="scheduled,waiting,attended" type="workflow" icon="STOCK_REDO"/>
+	            		<button string="Attended" name="attended" states="in_attention" type="workflow" icon="gtk-apply"/>
+	            		<button string="Annulled" name="annulled" states="scheduled,waiting" type="workflow" icon="gtk-stop"/>
+		                <field name="state" widget="statusbar"/>
+		            </header>
+					<sheet string="Medical Appointment">
+						<div class="oe_title">
+			                <group col="1">
+			                   <h1><label string="Medical Appointment"/></h1>
+			            	</group>                       
+	                    </div>
+						<group col="4">
+							<field name="name"/>
+							<field name="rescheduled" readonly="1"/>
+							<field name="appointment_date" attrs="{'readonly':[('state','in',['in_attention','attended','annulled'])]}"/>
+							<field name="postpone" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+							<field name="waiting_date" attrs="{'readonly':['|',('state','in',['in_attention','attended','annulled']),('postpone','=',False)]}"/>
+							<field name="attention_date" attrs="{'readonly':['|',('state','in',['attended','annulled']),('postpone','=',False)]}"/>
+							<field name="appointmet_type_id" required="1" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+							<field name="assigned_by" readonly="1"/>
+						</group>					
+						<group col="4">
+							<label string="Patient" for="patient_id" colspan="4"/>
+							<group colspan="4" col="6">
+								<field name="patient_id" colspan="2" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+							</group>
+						</group>
+						<notebook>            
+				        	<page string="Medical Evaluation" >
+					        	<group col="4">
+					        		<field name="doctor_id" colspan="4" attrs="{'readonly':[('state','not in',['in_attention', False])]}" options="{'no_open': True,'create_edit': false}"/>
+									<field name="reason_for_appointment" colspan="4" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+									<field name="patient_details" colspan="4" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+									<field name="medical_report" colspan="4" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+									<field name="requires_medical_leave" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+									<field name="requires_diet" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+									<field name="referral" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+									<field name="referral_specialty_id" attrs="{'readonly':[('state','not in',['in_attention', False])],'invisible':[('referral','=',False)]}" />
+									<!-- <field name="to_present" colspan="4" attrs="{'readonly':[('state','not in',['in_attention', False])],'invisible':[('referral','=',False)]}"/> -->
+									<label string="Prescription" for="prescription" colspan="2"/>
+									<label string="Indications" for="Indications" colspan="2"/>
+									<field name="prescription" nolabel="1" colspan="2" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+									<field name="prescription_indications" nolabel="1" colspan="2" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+								</group>
+				        	</page>
+				        	<page string="Disease/Pathology">
+				        		<group>
+				        			<field name="patient_disease_ids" domain="[('active','in',[False,True])]" nolabel="1" attrs="{'readonly':[('state','not in',['in_attention', False])]}">
+				        				<tree editable="bottom">
+				        					<field name="idx" options="{'no_open': True,'create_edit': false}"/>
+											<field name="disease_type_id" attrs="{'readonly':[('idx','=',False)]}" options="{'no_open': True,'create_edit': false}"/>
+											<field name="disease_id" attrs="{'readonly':[('idx','=',False)]}" domain="[('disease_type_id','=',disease_type_id)]" options="{'no_open': True,'create_edit': false}"/>
+											<field name="chronic"/>
+											<field name="waste_ime"/>
+											<field name="transfer"/>
+											<field name="remark"/>
+				        				</tree>
+				        			</field>
+				        		</group>      
+				        	</page>
+				        	<page string="Affected Area">
+				        		<field name="body_area_affected_ids" nolabel="1" attrs="{'readonly':[('state','not in',['in_attention', False])]}">
+				        			<tree editable="bottom">
+				        				<field name="body_system_type_id" options="{'no_open': True,'create_edit': false}"/> 
+										<field name="body_part_id" domain="['|',('system_id','=',type_system_id),('apparatus_id','=',type_system_id)]" options="{'no_open': True,'create_edit': false}"/>
+										<field name="on_left" attrs="{'readonly':['|',('on_right','=',True),('on_both','=',True)]}" />
+										<field name="on_right" attrs="{'readonly':['|',('on_left','=',True),('on_both','=',True)]}"/>
+										<field name="on_both" attrs="{'readonly':['|',('on_left','=',True),('on_right','=',True)]}" />
+										<field name="remark"/>
+				        			</tree>
+				        		</field>
+				        	</page>
+				        	<page string="Patient Service">
+				        		<field name="patient_service_ids" nolabel="1" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
+				        	</page>
+				        	<page string="Labour Data">
+				        		<group col="4">
+									<!-- <field name="employee_coach_hr_card"/>
+									<field name="employee_coach"/>
+									<field name="employee_management_code"/>
+									<field name="employee_management"/>
+									<field name="employee_department_code"/>
+									<field name="employee_department"/>
+									<field name="employee_job_code"/>
+									<field name="employee_job_desc"/>
+									<field name="employee_state"/>
+									<field name="employee_birthday"/>
+									<field name="employee_gender"/>
+									<field name="employee_age"/>
+									<field name="employee_blood_type"/>
+									<field name="employee_blood_factor"/>
+									<field name="employee_lefty"/>
+									<field name="employee_marital"/>
+									<field name="employee_educational_level"/>
+									<field name="employee_payroll_type"/> 
+									<field name="employee_employment_date"/>
+									<group col="4" colspan="2">
+									<field name="employee_year"/>
+									<field name="employee_month"/>
+									</group>
+									<field name="employee_mobile_phone"/>
+									<field name="employee_address" string= "Address"/> -->
+								</group>
+				        	</page>
+			        	</notebook>  
+					</sheet>
+   				</form>
+            </field>
+        </record>
+		<record model="ir.ui.view" id="medical_appointment_graph_view">
+            <field name="name">medical.appointment.graph.view</field>
+            <field name="model">medical.appointment</field>
+			<field name="type">graph</field>
+            <field name="arch" type="xml"> 
+		        <graph string="graph" type="bar">
+	                <field name="quantity"/>
+	                <field name="state"/>
+	            </graph>
+        	</field>
+    	</record>
+        <record model="ir.actions.act_window" id="medical_appointment_action">
+	        <field name="name">Medical Appointment</field>
+	        <field name="res_model">medical.appointment</field>	        
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form,graph</field>
+	        <field name="context">{'search_default_scheduled':1,'search_default_waiting':1,'search_default_in_attention':1}</field>
+	        <field name="search_view_id" ref="medical_appointment_search_view1"/>
+	    </record>
+       <record model="ir.actions.act_window.view" id="medical_appointment_tree_action_view3">
+	        <field name="act_window_id" ref="medical_appointment_action"/>
+	        <field name="sequence" eval="1"/>
+	        <field name="view_mode">tree</field>
+	        <field name="view_id" ref="medical_appointment_tree_view1"/>
+    	</record>
+    	<record model="ir.actions.act_window.view" id="medical_appointment_form_action_view4">
+	        <field name="act_window_id" ref="medical_appointment_action"/>
+	        <field name="sequence" eval="2"/>
+	        <field name="view_mode">form</field>
+	        <field name="view_id" ref="medical_appointment_form_view2"/>
+    	</record>
+    	<record model="ir.actions.act_window.view" id="medical_appointment_graph_action_view7">
+	        <field name="act_window_id" ref="medical_appointment_action"/>
+	        <field name="sequence" eval="3"/>
+	        <field name="view_mode">graph</field>
+	        <field name="view_id" ref="medical_appointment_graph_view"/>
+    	</record>
+
 	<!-- Views and action for medical_body_system_type -->
         <record model="ir.ui.view" id="medical_body_system_type_tree_view">
             <field name="name">medical.body.system.type.tree.view</field>

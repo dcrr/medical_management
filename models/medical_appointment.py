@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, date
 class medical_patient_disease(models.Model): 
     _name = "medical.patient.disease" 
     
-    type_disease_id = fields.Many2one('medical.disease.type', 'Type of Disease', ondelete="restrict")
+    disease_type_id = fields.Many2one('medical.disease.type', 'Type of Disease', ondelete="restrict")
     disease_id = fields.Many2one('medical.disease', 'Disease', ondelete="restrict")
     idx = fields.Many2one('medical.diagnostic.impression', 'IDX', ondelete="restrict")
     chronic = fields.Boolean(string='Chronic')
@@ -17,9 +17,8 @@ class medical_patient_disease(models.Model):
     remark = fields.Char('Remark',size=650)
     medical_appointment_id = fields.Many2one('medical.appointment', 'Medical Appointment', ondelete="cascade")
 
-class medical_patient_service(models.Model): 
-	
-	_name = "medical.patient.service" 
+class medical_patient_service(models.Model):
+    _name = "medical.patient.service"
     
     service_id = fields.Many2one('medical.nursing.service', 'Service', ondelete="restrict")
     range = fields.Boolean(related='service_id.range', string='Range', store=False, readonly=True, copy=False)
@@ -57,6 +56,29 @@ class medical_body_area(models.Model):
 	remark = fields.Char('Remark',size=650)
 	medical_appointment_id = fields.Many2one('medical.appointment', 'Medical Appointment')
 
+class medical_appointment_template_analysis(models.Model):
+    _name = 'medical.appointment.template.analysis'
+    
+    template_analysis_id = fields.Many2one('medical.template.analysis', 'Medical Analysis')
+    medical_appointment_id = fields.Many2one('medical.appointment', 'Medical appointment')
+    remark = fields.Text('Remark') 
+
+class medical_patient(models.Model):
+    _name = 'res.partner'
+    _inherit = 'res.partner'
+    
+    marital = fields.Selection([('single', 'Single'), ('married', 'married'),('widower', 'Widower'), ('divorced', 'Divorced')], 'Marital Status')
+
+def str2datetime(x):
+    if not x: return False
+    if len(x)>10:
+        format = "%Y-%m-%d %H:%M:%S"
+        x = x[0:19]
+    else:
+         format = "%Y-%m-%d"
+    date = datetime.strptime(x, format)
+    return date
+
 class medical_appointment(models.Model):
     _name = 'medical.appointment'
     
@@ -84,16 +106,39 @@ class medical_appointment(models.Model):
         for rec in self:
             rec.quantity = 1
     
+    # @api.onchange('patient_id')
+    # def _onchange_patient_id(self):
+    #     self.get_data_patient_id(self.patient_id,'')
+    
+    # @api.onchange('appointment_date')
+    # def _onchange_appointment_date(self):
+    #     if self.appointment_date and self.state in ['scheduled','waiting',False] and  not self.postpone: 
+    #         appointment_date = str2datetime(self.appointment_date)
+    #         if appointment_date < datetime.today():
+    #             if date.today() == appointment_date.date():
+    #                 appointment_date = appointment_date + timedelta(minutes=5)
+    #                 self.appointment_date = str(appointment_date)
+    #             else:
+    #                 self.appointment_date = ''
+    #                 return {'warning': {'title': "Warning",'message': "The appointment date must be greater or equal to the current date!",}}
+    #     for rec in self:
+    #         if rec.appointment_date != appointment_date:
+    #             rec.rescheduled = True
+    #             rec.assigned_by = self.env.uid
+    #         else:
+    #             rec.rescheduled = False
+
     name = fields.Char(string='Code', size=120, readonly=True)
     send_mail_to = fields.Char(compute='_get_send_mail_to', string='Send mail to', store=False)
     lang = fields.Char(compute='_get_lang', string='Language', store = False)
     appointment_date = fields.Datetime('Appointment Date', select="1")
-    appointment_date_email = fields.Char(compute='appoinment_email', string='Appoinment email', store=True)
+    appointment_date_email = fields.Char(compute='_appoinment_email', string='Appoinment email', store=True)
     waiting_date = fields.Datetime('Waiting Date')
     attention_date = fields.Datetime('Attention Date')
     patient_id = fields.Many2one('res.partner', 'Patient', ondelete="restrict")
     patient_age = fields.Integer(string='Age', readonly=True)
-    #patient_marital = fields.Char(string='Marital Status', size=60, readonly=True)
+    patient_marital = fields.Selection(related='patient_id.marital', string='Marital Status', readonly=True, store=True, copy=False)
+    patient_name = fields.Char(related='patient_id.name', string='Patient', readonly=True, store=True, copy=False)
     # patient_blood_type = fields.related('patient_id', 'blood_type', string='Blood Type', type='char',store=False, readonly=True)
     # patient_blood_factor = fields.related('employee_id', 'blood_factor', string='Blood Factor', type='char',store=False, readonly=True)
     # employee_state = fields.char(string='Employee State',readonly=True)
@@ -103,7 +148,7 @@ class medical_appointment(models.Model):
     # #'employee_lefty = fields.boolean('Lefty')
     # employee_educational_level = fields.many2one('hr.alucasa.educational.level', string='Educational Level', readonly=True, ondelete="restrict")
     appointmet_type_id = fields.Many2one('medical.appointment.type', 'Type Medical Appointment', ondelete="restrict")
-    appointmet_type_category = fields.Char(related='appointmet_type_id.category', string='Appointment Category', store=True, readonly=True, copy=False)
+    appointmet_category = fields.Selection(related='appointmet_type_id.category', string='Appointment Category', store=True, readonly=True, copy=False)
     assigned_by = fields.Many2one('res.users',string='Assigned By', readonly=True, ondelete="restrict")
     rescheduled = fields.Boolean('Rescheduled', readonly=True)
     postpone = fields.Boolean('Postpone')
@@ -117,14 +162,14 @@ class medical_appointment(models.Model):
     requires_medical_leave = fields.Boolean(string='Requires Medical Leave')
     requires_diet = fields.Boolean(string='Requires Diet')
     referral = fields.Boolean(string='Referral')
-    # specialist = fields.char(string='Specialist', size=300)
+    referral_specialty_id = fields.Many2one('specialization',string='Referred specialty', ondelete="restrict")
+    specialist_name = fields.Char(related='referral_specialty_id.name', string='Referred specialty', store=True, readonly=True, copy=False)
     # to_present = fields.text(string='To Present')
     prescription = fields.Text(string='Prescription', size=120)
     prescription_indications = fields.Text(string='Indications', size=120)
     patient_disease_ids = fields.One2many('medical.patient.disease', 'medical_appointment_id','Diseases',domain=['|',('active','=',False),('active','=',True)])
-    body_area_affected_ids = fields.one2many('medical.body.area', 'medical_appointment_id','Body Area Affected')
+    body_area_affected_ids = fields.One2many('medical.body.area', 'medical_appointment_id','Body Area Affected')
     patient_service_ids = fields.One2many('medical.patient.service', 'medical_appointment_id','Patient Services')
-    # clinical_analysis_ids = fields.one2many('medical.appointment.clinical.analysis', 'medical_appointment_id','Clinical Analysis')
-    # template_clinical_analysis_ids = fields.many2many('template.clinical.analysis', 'medical_appointment_clinical_analysis','medical_appointment_id','template_clinical_analysis_id','Templates')
+    template_analysis_ids = fields.One2many('medical.appointment.template.analysis', 'medical_appointment_id','Medical Analysis')
     color = fields.Integer('Color')
     quantity = fields.Integer(compute='_get_quantity', string='Count', store=True)

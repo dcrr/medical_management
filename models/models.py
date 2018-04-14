@@ -166,7 +166,7 @@ class medical_staff(models.Model):
 	_name = 'hr.employee'
 	_inherit = 'hr.employee'
 
-	@api.onchange('profession')
+	@api.onchange('profession_ids')
 	def _onchange_profession(self):
 		self.specialization_id=''
 	
@@ -270,13 +270,18 @@ class medical_analysis_group(models.Model):
 	description = fields.Text('Description')
 	analysis_type_id = fields.Many2one('medical.analysis.type', 'Type', ondelete="restrict")
 
+class medical_analysis(models.Model):
+	_name = 'medical.analysis'
+	
+	name = fields.Char(string='Name', size=120)
+	description = fields.Text('Description')
+
 class medical_analysis_details(models.Model):
 	_name = 'medical.analysis.details'
 	
 	name = fields.Char(string='Name', size=120)
 	description = fields.Text('Description')
 	
-
 class medical_template_analysis(models.Model):
 	_name = 'medical.template.analysis'
 	
@@ -292,4 +297,3 @@ class medical_template_analysis(models.Model):
 	type_id = fields.Many2one(related='group_id.analysis_type_id', string='Type', relation='medical.analysis.type', store=True, ondelete="restrict")
 	analysis_id = fields.Many2one('medical.analysis', 'Medical Analysis', ondelete="restrict")
 	details_id = fields.Many2one('medical.analysis.details', 'Details', ondelete="restrict")
-	
