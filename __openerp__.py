@@ -8,6 +8,7 @@
     "depends" : ['base', 'resource', 'hr'],
 	'data' : ['views/views.xml',
               'views/menu.xml',
+              'workflow/medical_appointment_wkf.xml',
               ],
 	'active': True,
     'installable': True	

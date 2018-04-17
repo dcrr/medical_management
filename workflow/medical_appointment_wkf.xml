@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+<data noupdate="1">
+	<!-- Workflow medical_appointment -->
+	<record model="workflow" id="medical_appointment_wkf">
+		<field name="name">medical.appointment.wkf</field>
+		<field name="osv">medical.appointment</field>
+		<field eval="1" name="on_create"/>
+	</record>
+	
+	<record model="workflow.activity" id="medical_appointment_act_scheduled">
+		<field name="wkf_id" ref="medical_appointment_wkf" />
+		<field name="name">scheduled</field>
+		<field name="flow_start">True</field>
+		<field name="kind">function</field>
+		<field name="action">update_state('scheduled')</field>
+	</record>
+	
+	<record model="workflow.activity" id="medical_appointment_act_waiting">
+		<field name="wkf_id" ref="medical_appointment_wkf" />
+		<field name="name">waiting</field>
+		<field name="kind">function</field>
+		<field name="action">waiting()</field>
+	</record>
+
+	<record model="workflow.activity" id="medical_appointment_act_annulled">
+		<field name="wkf_id" ref="medical_appointment_wkf" />
+		<field name="name">annulled</field>
+		<field name="kind">function</field>
+		<field name="action">update_state('annulled')</field>
+	</record>
+	
+	<record model="workflow.activity" id="medical_appointment_act_attention">
+		<field name="wkf_id" ref="medical_appointment_wkf" />
+		<field name="name">in_attention</field>
+		<field name="kind">function</field>
+		<field name="action">in_attention('in_attention')</field>
+	</record>
+	
+	<record model="workflow.activity" id="medical_appointment_act_attended">
+		<field name="wkf_id" ref="medical_appointment_wkf" />
+		<field name="name">attended</field>
+		<field name="kind">function</field>
+		<field name="action">write({'state':'attended'})</field>
+	</record>
+
+	<record model="workflow.transition" id="medical_appointment_trans_scheduled_waiting">
+		<field name="act_from" ref="medical_appointment_act_scheduled"/>
+		<field name="act_to" ref="medical_appointment_act_waiting"/>
+		<field name="signal">waiting</field>
+	</record>
+	
+	<record model="workflow.transition" id="medical_appointment_trans_scheduled_attention">
+		<field name="act_from" ref="medical_appointment_act_scheduled"/>
+		<field name="act_to" ref="medical_appointment_act_attention"/>
+		<field name="signal">in_attention</field>
+	</record>
+	
+	<record model="workflow.transition" id="medical_appointment_trans_attention_waiting">
+		<field name="act_from" ref="medical_appointment_act_attention"/>
+		<field name="act_to" ref="medical_appointment_act_waiting"/>
+		<field name="signal">waiting</field>
+	</record>
+
+	<record model="workflow.transition" id="medical_appointment_trans_scheduled_annulled">
+		<field name="act_from" ref="medical_appointment_act_scheduled"/>
+		<field name="act_to" ref="medical_appointment_act_annulled"/>
+		<field name="signal">annulled</field>
+	</record>
+	
+	<record model="workflow.transition" id="medical_appointment_trans_aut_scheduled_annulled">
+		<field name="act_from" ref="medical_appointment_act_scheduled"/>
+		<field name="act_to" ref="medical_appointment_act_annulled"/>
+		<field name="condition">validate_appointment_date_annul()</field> 
+	</record>
+	
+	<record id="medical_appointment_trans_aut_waiting_annulled" model="workflow.transition">
+		<field name="act_from" ref="medical_appointment_act_waiting"/>
+		<field name="act_to" ref="medical_appointment_act_annulled"/>
+       <field name="condition">validate_appointment_date_annul()</field> 
+	</record>
+
+	<record model="workflow.transition" id="medical_appointment_trans_waiting_scheduled">
+		<field name="act_from" ref="medical_appointment_act_waiting"/>
+		<field name="act_to" ref="medical_appointment_act_scheduled"/>
+		<field name="signal">scheduled</field>
+	</record>
+	
+	<record model="workflow.transition" id="medical_appointment_trans_waiting_attention">
+		<field name="act_from" ref="medical_appointment_act_waiting"/>
+		<field name="act_to" ref="medical_appointment_act_attention"/>
+		<field name="signal">in_attention</field>
+	</record>
+	
+	<record model="workflow.transition" id="medical_appointment_trans_waiting_annulled">
+		<field name="act_from" ref="medical_appointment_act_waiting"/>
+		<field name="act_to" ref="medical_appointment_act_annulled"/>
+		<field name="signal">annulled</field>
+	</record>
+	
+	<record model="workflow.transition" id="medical_appointment_trans_attention_attended">
+		<field name="act_from" ref="medical_appointment_act_attention"/>
+		<field name="act_to" ref="medical_appointment_act_attended"/>
+		<field name="signal">attended</field>
+	</record>
+
+	<record model="workflow.transition" id="medical_appointment_trans_attended_attention">
+		<field name="act_from" ref="medical_appointment_act_attended"/>
+		<field name="act_to" ref="medical_appointment_act_attention"/>
+		<field name="signal">in_attention</field>
+	</record>
+
+	</data>
+</openerp>

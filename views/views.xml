@@ -6,7 +6,8 @@
             <field name="name">Medical Appointment</field>
             <field name="model">medical.appointment</field>
             <field name="arch" type="xml">
-                <calendar string="Appointment" color="state" day_length="24" date_start="appointment_date">
+                <calendar string="Appointment" quick_add="False" form_view_id="medical_appointment_form_view1" color="state" day_length="24" date_start="appointment_date">
+					<field name="name"/>
                     <field name="patient_id"/>
                 </calendar>
             </field>
