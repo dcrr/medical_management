@@ -1,0 +1,48 @@
+<openerp>
+    <data>
+
+     <!-- Emplyee medical category  -->
+        <record model="hr.employee.category" id="medical_parent_employee_category">
+            <field name="name">Medical</field>
+            <field name="display_name">Medical</field>
+        </record>
+        <record model="hr.employee.category" id="medical_doctor_employee_category">
+            <field name="name">Doctor</field>
+            <field name="parent_id" eval="medical_parent_employee_category"/>
+        </record>
+        <record model="hr.employee.category" id="medical_nurse_employee_category">
+            <field name="name">Nurse</field>
+            <field name="parent_id" eval="medical_parent_employee_category"/>
+        </record>
+
+    <!-- Sequence medical appointment -->
+        <record model="ir.sequence.type" id="seq_type">
+            <field name="name">sequence</field>
+            <field name="code">medical_appointment_code</field>
+        </record>
+        
+        <record  model="ir.sequence" id="medical_appointment_seq">
+            <field name="name">Medical Appointment Mask</field>
+            <field name="code">medical_appointment_code</field>
+            <field name="padding">4</field>
+            <field name="prefix">MA%(y)s%(month)s%(day)s</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>           
+        </record>
+    
+    <!-- Sequence medical history -->
+        <record model="ir.sequence.type" id="seq_type">
+            <field name="name">sequence</field>
+            <field name="code">medical_history_code</field>
+        </record>
+        
+        <record  model="ir.sequence" id="medical_history_seq">
+            <field name="name">Medical History Mask</field>
+            <field name="code">medical_history_code</field>
+            <field name="padding">4</field>
+            <field name="prefix">MH%(y)s%(month)s%(day)s</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>           
+        </record>
+    </data>
+</openerp>

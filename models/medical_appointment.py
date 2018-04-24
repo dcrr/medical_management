@@ -32,22 +32,8 @@ class medical_patient_service(models.Model):
     description = fields.Char('Description',size=650)
     result = fields.Char('Result',size=650)
     altered = fields.Boolean(string='Altered')
-    staff_id = fields.Many2one('hr.employee', 'Nursing Staff', ondelete="restrict") # domain=[('profession','=','enf')]
-    # route_administration_id = fields.Many2one('route.administration', 'Route Administration', ondelete="restrict")
+    staff_id = fields.Many2one('hr.employee', 'Nursing Staff', ondelete="restrict")
     medical_appointment_id = fields.Many2one('medical.appointment', 'Medical Appointment')
-    # nursing_attention_id = fields.Many2one('medical.nursing.attention', 'Nursing Attention', ondelete="cascade"
-
-	# def onchange_service_id(self, cr, uid, ids, service_id):
-	# 	""""""
-	# 	result = {}
-	# 	if service_id:
-	# 		service_obj = self.pool.get('nursing.service')
-	# 		service = service_obj.read(cr, uid, service_id, ['range','minimum','normal','maximum'])
-	# 		result.update({'value': {'range':service['range'], 'min_range':service['minimum'], 
-	# 								'normal_range':service['normal'],'max_range':service['maximum']} })
-	# 	else:
-	# 		result.update({'value': {'range':'', 'min_range':'', 'normal_range':'','max_range':''} })
-	# 	return result
 
 class medical_body_area(models.Model):
 	_name = "medical.body.area"
@@ -67,21 +53,89 @@ class medical_appointment_template_analysis(models.Model):
     medical_appointment_id = fields.Many2one('medical.appointment', 'Medical appointment')
     remark = fields.Text('Remark') 
 
+class medical_blood_type(models.Model):
+    _name = 'medical.blood.type'    
+    
+    def _get_name(self):
+        for rec in self:
+            rec.name = rec.type + rec.factor_rh
+
+    name = fields.Char(compute='_get_name',string='Name')
+    type = fields.Char(string='Type')
+    factor_rh = fields.Char(string='Factor RH')
+
+class medical_history(models.Model):
+    _name = 'medical.history'    
+    
+    code = fields.Char(string='History Number', readonly=True)
+    patient_id = fields.Many2one('res.partner', string="Patient", domain="[('type','=','patient')]")
+    patient_blood_type = fields.Many2one(related='patient_id.blood_type', string='Blood Type')
+    patient_age = fields.Integer(related='patient_id.age', string='Age')
+    patient_gender = fields.Selection(related='patient_id.gender', string='Gender')
+    disease_ids = fields.Many2many('medical.disease', string="Diseases")
+    medical_treatment = fields.Text(string="Current Treatment", help="Medical treament that you are currently consuming")
+    medications_usually = fields.Text(string="Usual", help="What medications usually consume?")
+    medications_last5years = fields.Text(string="Last 5 years", help="What medications have you used in the last five years?")
+    medications_allergic_b = fields.Boolean(string='Allergies?', help="Are you allergic to any medications?")
+    medications_allergic = fields.Text(string='Allergic to medications', help="What medication are you allergic to?")
+    father_alive = fields.Boolean('Is your father alive?')
+    father_disease_ids = fields.Many2many('medical.disease', string="Father Diseases", help="Father Diseases")
+    mother_alive = fields.Boolean('Is your mother alive?')
+    mother_disease_ids = fields.Many2many('medical.disease', string="Mother Diseases", help="Mother Diseases")
+    brothers = fields.Boolean('Do you have brothers or sisters?')
+    brother_disease_ids = fields.Many2many('medical.disease', string="Brothers Diseases", help="Brothers Diseases")
+    operated = fields.Boolean(string='Operated?', help="Have you been operated?")
+    operations = fields.Text(string="Operations", help="What operations have you had?")
+
+
+    @api.model
+    def create(self, vals):
+        vals['code'] = self.env['ir.sequence'].get('medical_history_code')
+        return super(medical_history, self).create(vals)
+
 class medical_patient(models.Model):
     _name = 'res.partner'
     _inherit = 'res.partner'
     
-    def _get_age(self):
+    @api.one
+    def _compute_age(self):
         today = date.today()
         for rec in self:
-            born = datetime.strptime(rec.birthday, '%Y-%m-%d')
-            return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+            if rec.birthdate:
+                born = datetime.strptime(rec.birthdate, '%Y-%m-%d %H:%M:%S')
+                rec.age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+    
+    @api.one
+    @api.depends('name', 'last_name')
+    def _compute_display_name(self):
+        for rec in self:
+            if rec.name and rec.last_name:
+                rec.display_name = rec.name.lstrip().rstrip() + ' ' + rec.last_name.lstrip().rstrip()
+            else:
+                rec.display_name = rec.name
+    
+    @api.multi
+    def name_get(self):
+        for rec in self:
+            res = []
+            if rec.env.context.get('special_display_name'):
+                res.append((rec.id, "%s" % (rec.display_name)))
+            else:
+                res = super(medical_patient, self).name_get()
+            return res
 
+    display_name = fields.Char(string='Name', compute='_compute_display_name')
     identification = fields.Char(string='Identification Number', size=12)
-    gender = fields.Selection([('female', 'Female'), ('masculine', 'Masculine')], 'Marital Status')
+    last_name = fields.Char(string='Last Name', size=300)
+    gender = fields.Selection([('female', 'Female'), ('masculine', 'Masculine')], 'Gender')
     marital = fields.Selection([('single', 'Single'), ('married', 'married'),('widower', 'Widower'), ('divorced', 'Divorced')], 'Marital Status')
-    age = fields.Integer(compute='_get_age', string='Age')
-
+    age = fields.Integer(compute='_compute_age', string='Age')
+    birth_country = fields.Many2one('res.country', string='Country of Birth')
+    birth_state = fields.Many2one('res.country.state', string='State of Birth')
+    profession_id = fields.Many2one('profession', string="Profession")
+    blood_type = fields.Many2one('medical.blood.type', string='Blood Type')
+    lefty = fields.Boolean('Lefty')
+    type = fields.Selection(selection_add=[('patient', 'Patient')], string='Type')
 
 def str2datetime(x):
     if not x: return False
@@ -159,55 +213,29 @@ class medical_appointment(models.Model):
 
         self.analysis_ids = out_analysis_ids
 
-    # @api.onchange('patient_id')
-    # def _onchange_patient_id(self):
-    #     self.get_data_patient_id(self.patient_id,'')
-    
-    # @api.onchange('appointment_date')
-    # def _onchange_appointment_date(self):
-    #     if self.appointment_date and self.state in ['scheduled','waiting',False] and  not self.postpone: 
-    #         appointment_date = str2datetime(self.appointment_date)
-    #         if appointment_date < datetime.today():
-    #             if date.today() == appointment_date.date():
-    #                 appointment_date = appointment_date + timedelta(minutes=5)
-    #                 self.appointment_date = str(appointment_date)
-    #             else:
-    #                 self.appointment_date = ''
-    #                 return {'warning': {'title': "Warning",'message': "The appointment date must be greater or equal to the current date!",}}
-    #     for rec in self:
-    #         if rec.appointment_date != appointment_date:
-    #             rec.rescheduled = True
-    #             rec.assigned_by = self.env.uid
-    #         else:
-    #             rec.rescheduled = False
-
-    name = fields.Char(string='Code', size=120, readonly=True)
+   
+    name = fields.Char(string='Code', size=12, readonly=True)
     send_mail_to = fields.Char(compute='_get_send_mail_to', string='Send mail to', store=False)
     lang = fields.Char(compute='_get_lang', string='Language', store = False)
     appointment_date = fields.Datetime('Appointment Date', select="1")
     appointment_date_email = fields.Char(compute='_appoinment_email', string='Appoinment email', store=True)
     waiting_date = fields.Datetime('Waiting Date')
     attention_date = fields.Datetime('Attention Date')
-    patient_id = fields.Many2one('res.partner', 'Patient', ondelete="restrict")
+    patient_id = fields.Many2one('res.partner', 'Patient', ondelete="restrict", domain="[('type','=','patient')]")
+    patient_identification = fields.Char(related='patient_id.identification', string='Identification', readonly=True, store=True, copy=False)
     patient_age = fields.Integer(string='Age', readonly=True)
     patient_marital = fields.Selection(related='patient_id.marital', string='Marital Status', readonly=True, store=True, copy=False)
     patient_name = fields.Char(related='patient_id.name', string='Patient', readonly=True, store=True, copy=False)
-    # patient_blood_type = fields.related('patient_id', 'blood_type', string='Blood Type', type='char',store=False, readonly=True)
-    # patient_blood_factor = fields.related('employee_id', 'blood_factor', string='Blood Factor', type='char',store=False, readonly=True)
-    # employee_state = fields.char(string='Employee State',readonly=True)
-    # employee_gender = fields.related('employee_id', 'gender', string='Gender', type='char',store=False, readonly=True)
-    # employee_birthday = fields.related('employee_id', 'birthday', string='Birthday', type='date',store=False, readonly=True) 
-    # employee_mobile_phone = fields.char(string='Employee Phone', readonly=True)
-    # #'employee_lefty = fields.boolean('Lefty')
-    # employee_educational_level = fields.many2one('hr.alucasa.educational.level', string='Educational Level', readonly=True, ondelete="restrict")
     appointmet_type_id = fields.Many2one('medical.appointment.type', 'Type Medical Appointment', ondelete="restrict")
     appointmet_category = fields.Selection(related='appointmet_type_id.category', string='Appointment Category', store=True, readonly=True, copy=False)
-    assigned_by = fields.Many2one('res.users',string='Assigned By', readonly=True, ondelete="restrict")
+    assigned_by = fields.Many2one('res.users', string='Assigned By', readonly=True, ondelete="restrict", default=lambda self: self.env.user)
     rescheduled = fields.Boolean('Rescheduled', readonly=True)
     postpone = fields.Boolean('Postpone')
     state = fields.Selection([('scheduled', 'Scheduled'), ('waiting', 'Waiting'), ('annulled', 'Annulled'),
                                ('in_attention', 'In Attention'), ('attended', 'Attended')],'State')
-    doctor_id = fields.Many2one('hr.employee', string='Doctor', ondelete="restrict") #, domain=[('profession','=','med')]
+    doctor_id = fields.Many2one('hr.employee', string='Doctor', ondelete="restrict", domain ="[('category_name', 'in',['Doctor'])]") 
+    doctor_profession = fields.Many2many(related='doctor_id.profession_ids', string='Professions', ondelete="restrict")
+    doctor_specialization = fields.Many2many(related='doctor_id.specialization_ids', string='Specialties', ondelete="restrict")
     reason_for_appointment = fields.Char(string='Reason for appointment', size=120)
     patient_details = fields.Text(string='Patient Details')
     medical_report = fields.Text(string='Medical Report')
@@ -257,6 +285,12 @@ class medical_appointment(models.Model):
                 if str2datetime(rec.waiting_date) > str2datetime(rec.attention_date):
                     raise ValidationError("The waiting date can not be greater to the attention date!")
 
+    @api.model
+    def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].get('medical_appointment_code')
+        return super(medical_appointment, self).create(vals)
+
+        
     def send_email_template(self, template_name):
         salesorder_tpl = self.env['email.template'].search([('name','=',template_name)])
         if len(salesorder_tpl)>0:
