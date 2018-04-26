@@ -111,23 +111,6 @@ class medical_disease(models.Model):
     
 	_order = 'name'	
 	_sql_constraints = [('name_uniq', 'unique (name)', 'The name must be unique!'),]
-
-# Types of medical appointments
-class medical_appointment_type(models.Model):
-	_name = "medical.appointment.type"
-
-	@api.onchange('name')
-	def _onchange_name(self):
-		if self.name: 
-			self.name = self.name.title().strip()
-		
-	name = fields.Char(string='Name', size=100, required=True, help='Name')
-	description = fields.Text(string='Description', required=True, help='Description')
-	category = fields.Selection([('curative','Curative'),('preventive','Preventive')], 'Category',required=True)	
-	active = fields.Boolean(string='Active',default=True, help="For records associated with other records!")
-
-	_order = 'name'	
-	_sql_constraints = [('name_uniq', 'unique (name)', 'The description must be unique!'),]
 	
 # Services provided by nursing
 class medical_nursing_service(models.Model):
@@ -184,6 +167,7 @@ class medical_staff(models.Model):
 	last_name = fields.Char(string='Last Name', size=300)
 	display_name = fields.Char(string='Name', compute='_compute_display_name')	
 	category_name = fields.Char(related="category_ids.name", string="Category")
+	category_parent = fields.Char(related="category_ids.parent_id.name", string="Parent Category")
 	profession_ids = fields.Many2many('profession', string="Professions")
 	specialization_ids = fields.Many2many('specialization', string="Specializations")
 	schedule_ids = fields.Many2many('resource.calendar.attendance', string="Attention Schedule")
@@ -236,24 +220,6 @@ class medical_diagnostic_impression(models.Model):
 
 	_order = 'name'
 	_sql_constraints = [('name_uniq','unique(name)', 'The name must be unique!')]
-
-class medical_activity_type(models.Model):
-	_name = 'medical.activity.type'
-	
-	name = fields.Char(string='Name', size=100)
-	description = fields.Text(string='Description')
-	active = fields.Boolean('Active', default=True, help="For records associated with other records!")
-	service_type = fields.Selection([('preventive', 'Preventive'), ('curative', 'Curative')], 'Service Type')
-	type_medical_service = fields.Selection([('occupational', 'Occupational'), ('integral', 'Integral')],'Type Medical Service')
-
-	@api.constrains('name')
-	def _check_name(self, cr, uid, ids,context=None):
-		if context is None:
-			context = {}
-		for rec in self.browse(cr, uid, ids, context=context):
-			cr.execute("SELECT id FROM medical_activity_type WHERE id != %d AND lower(trim(name)) = lower(trim('%s'))" %(rec.id, rec.name,))
-			if len(cr.fetchall())>0:
-				raise ValidationError("The name must be unique!")
 
 class medical_analysis_type(models.Model):	
 	_name = 'medical.analysis.type'

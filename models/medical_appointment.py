@@ -157,13 +157,32 @@ def str2date(x):
     date = datetime.strptime(x, format).date()
     return date
 
+# Types of medical appointments
+class medical_appointment_type(models.Model):
+	_name = "medical.appointment.type"
+
+	@api.onchange('name')
+	def _onchange_name(self):
+		if self.name: 
+			self.name = self.name.title().strip()
+		
+	name = fields.Char(string='Name', size=100, required=True, help='Name')
+	description = fields.Text(string='Description', required=True, help='Description')
+	category = fields.Selection([('curative','Curative'),('preventive','Preventive')], 'Category',required=True)	
+	active = fields.Boolean(string='Active',default=True, help="For records associated with other records!")
+
+	_order = 'name'	
+	_sql_constraints = [('name_uniq', 'unique (name)', 'The description must be unique!'),]
+
 class medical_appointment(models.Model):
     _name = 'medical.appointment'
     
+    @api.one
     def _get_send_mail_to(self):
         for rec in self:
             rec.id = rec.employee_id.work_email
     
+    @api.one
     def _get_lang(self):
         if self._context.get('lang'):
             self.lang = self._context['lang']
@@ -172,6 +191,7 @@ class medical_appointment(models.Model):
             if len(lang_list)>0:
                 self.lang= lang_list.code
     
+    @api.one
     def _appoinment_email(self):
         for rec in self:
             fecha_utc = rec.appointment_date
@@ -179,7 +199,7 @@ class medical_appointment(models.Model):
             fecha_gmt = fecha_utc - timedelta(hours=4)
             fecha_gmt = fecha_gmt.strftime('%Y-%m-%d %H:%M:%S')
             rec.appointment_date_email = fecha_gmt
-    
+    @api.one
     def _get_quantity(self):
         for rec in self:
             rec.quantity = 1
@@ -278,7 +298,7 @@ class medical_appointment(models.Model):
                 if str2datetime(rec.waiting_date) > str2datetime(rec.appointment_date):
                     raise ValidationError("The waiting date can not be greater to the appointment date!")
     
-    @api.constrains('attention_date')
+    @api.constrains('atraise ValidationError("The waiting date can not be greater to the appointment date!")tention_date')
     def _check_attention_date(self):
         for rec in self:
             if rec.attention_date and rec.waiting_date:

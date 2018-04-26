@@ -296,8 +296,6 @@
 					<field string="Disease" name="patient_disease_ids"/>
 					<field name="patient_service_ids"/>
 					<field name="state"/>
-	        		<filter string="Trabajadores" name="employee_id" domain="[('foreign_patient','=',False)]" />
-	        		<filter string="Foraneos" name="employee_id" domain="[('foreign_patient','=',True)]" />
 	        		<separate />
 	        		<filter string="Scheduled" name="scheduled" domain="[('state','=','scheduled')]"/>
 	        		<filter string="Waiting" name="waiting" domain="[('state','=','waiting')]"/>
@@ -305,14 +303,12 @@
 	        		<filter string="Attended" name="attended" domain="[('state','=','attended')]"/>
 	        		<filter string="Annulled" name="annulled" domain="[('state','=','annulled')]"/>
 	        		<separate />
-	        		<filter string="Preventivas" name="type_medical_appointmet_id" domain="[('appointmet_type_id.category','like','preventive')]"/>
-	        		<filter string="Curativas" name="type_medical_appointmet_id" domain="[('appointmet_type_id.category','like','curative')]"/>
+	        		<filter string="Preventivas" name="appointmet_type_id" domain="[('appointmet_type_id.category','like','preventive')]"/>
+	        		<filter string="Curativas" name="appointmet_type_id" domain="[('appointmet_type_id.category','like','curative')]"/>
 	        		<group expand="0" string="Agrupado Por...">
-                        <filter string="Paciente" name="employee_id" context="{'group_by': 'employee_id'}"/>
-                        <!-- <filter string="Departamento" name="employee_department" context="{'group_by': 'employee_department'}"/> -->
-                        <filter string="Tipo de Consulta" name="type_medical_appointmet_id" context="{'group_by': 'appointmet_type_id'}"/>
+                        <filter string="Paciente" name="patient_id" context="{'group_by': 'patient_id'}"/>
+                        <filter string="Tipo de Consulta" name="appointmet_type_id" context="{'group_by': 'appointmet_type_id'}"/>
                         <filter string="Médico" name="doctor" context="{'group_by': 'doctor'}"/>
-                        <filter string="Categoría" name="appointmet_type_id" context="{'group_by': 'type_consult'}" />
                         <filter string="Año Atención" name="attention_date" context="{'group_by': 'attention_date:year'}"/>
                         <filter string="Mes Atención" name="attention_date" context="{'group_by': 'attention_date:month'}"/>
                         <filter string="Día Atención" name="attention_date" context="{'group_by': 'attention_date:day'}" />
@@ -416,35 +412,6 @@
 				        	</page>
 				        	<page string="Patient Service">
 				        		<field name="patient_service_ids" nolabel="1" attrs="{'readonly':[('state','not in',['in_attention', False])]}"/>
-				        	</page>
-				        	<page string="Labour Data">
-				        		<group col="4">
-									<!-- <field name="employee_coach_hr_card"/>
-									<field name="employee_coach"/>
-									<field name="employee_management_code"/>
-									<field name="employee_management"/>
-									<field name="employee_department_code"/>
-									<field name="employee_department"/>
-									<field name="employee_job_code"/>
-									<field name="employee_job_desc"/>
-									<field name="employee_state"/>
-									<field name="employee_birthday"/>
-									<field name="employee_gender"/>
-									<field name="employee_age"/>
-									<field name="employee_blood_type"/>
-									<field name="employee_blood_factor"/>
-									<field name="employee_lefty"/>
-									<field name="employee_marital"/>
-									<field name="employee_educational_level"/>
-									<field name="employee_payroll_type"/> 
-									<field name="employee_employment_date"/>
-									<group col="4" colspan="2">
-									<field name="employee_year"/>
-									<field name="employee_month"/>
-									</group>
-									<field name="employee_mobile_phone"/>
-									<field name="employee_address" string= "Address"/> -->
-								</group>
 				        	</page>
 			        	</notebook>  
 					</sheet>
@@ -1022,5 +989,186 @@
 	        <field name="view_type">form</field>
 	        <field name="view_mode">tree,form</field>
 		</record> 
+
+	<!-- Views and action for medical_activity -->
+		<record model="ir.ui.view" id="medical_activity_search_view">
+            <field name="name">medical.activity.search</field>
+            <field name="model">medical.activity</field>
+            <field name="arch" type="xml">
+               <search string="Activity">
+					<field string="Inicio Fecha Programada" name="programming_date" filter_domain="[('programming_date','>=',self)]" />
+					<field string="Fin Fecha Programada" name="programming_date" filter_domain="[('programming_date','&lt;=',self)]" />
+					<field string="Inicio Fecha Ejecución" name="execution_date" filter_domain="[('execution_date','>=',self)]" />
+					<field string="Fin Fecha Ejecución" name="execution_date" filter_domain="[('execution_date','&lt;=',self)]" />
+					<field string="Tipo de Actividad" name="activity_type_id" context="{'group_by': 'type_activity_id'}"/>
+	        		<field string="State" name="state" context="{'group_by': 'state'}"/>
+					<filter string="Borrador" name="state" domain="[('state','=','draft')]"/>
+					<filter string="Programado" name="state" domain="[('state','=','programmed')]"/>
+					<filter string="En Ejecución" name="state" domain="[('state','=','running')]"/>
+					<filter string="Ejecutado" name="state" domain="[('state','=','executed')]"/>
+					<filter string="Anulado" name="state" domain="[('state','=','annulled')]"/>
+					<separate />
+	        		<group expand="0" string="Agrupado Por...">
+	        			<filter string="Tipo de Actividad" name="activity_type_id" context="{'group_by': 'type_activity_id'}"/>
+	        			<filter string="State" name="state" context="{'group_by': 'state'}"/>
+	        			<filter string="Mes Ejecución" name="execution_date" context="{'group_by': 'execution_date:month'}"/>
+	        			<filter string="Año Ejecución" name="execution_date" context="{'group_by': 'execution_date:year'}"/>
+	        		</group>
+                </search>
+            </field>
+        </record>
+		<record model="ir.ui.view" id="medical_activity_tree_view">
+            <field name="name">medical.activity.tree.view</field>
+            <field name="model">medical.activity</field>
+			<field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree string="Activity">
+					<field name="name"/>
+					<field name="programming_date"/>
+					<field name="activity_type_id"/>
+					<field name="remark"/>	
+                </tree>
+            </field>
+     	</record>
+		<record model="ir.ui.view" id="medical_activity_calendar_view">
+            <field name="name">Activity</field>
+            <field name="model">medical.activity</field>
+            <field name="arch" type="xml">
+                <calendar string="Activities" quick_add="False" form_view_id="medical_activity_form_view" color="activity_type_id" day_length="24" date_start="programming_date">
+                    <field name="programming_date"/>
+                    <field name="activity_type_id"/>
+                </calendar>
+            </field>
+        </record>
+		<record model="ir.ui.view" id="medical_activity_form_view">
+            <field name="name">medical.activity.form.view</field>
+            <field name="model">medical.activity</field>
+			<field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Activity">
+                	<header>
+	            		<button string="Programmed" name="programmed" states="draft,running" type="workflow" icon="terp-go-today"/>
+	            		<button string="Running"  name="running" states="draft,programmed,executed" type="workflow" icon="gtk-go-forward"/>
+	            		<button string="Executed" name="executed" states="running" type="workflow" icon="gtk-apply"/>
+	            		<button string="Annulled"  name="annulled" states="draft,programmed" type="workflow" icon="gtk-stop"/>
+		                <field name="state" widget="statusbar"/>
+		            </header>
+					<sheet string="Activity">
+						<div class="oe_title">
+			                <group col="1">
+			                	<h1><label string="Activity"/></h1>
+			            	</group>
+			            </div>
+			            <group>
+			            <group>
+			            	<field name="name"/>
+			            	<field name="activity_type_id" attrs="{'readonly':[('state','in',['executed','annulled'])]}"/>
+			            	<field name="programming_date" attrs="{'readonly':[('state','in',['executed','annulled'])]}"/>
+			            	<field name="start_date" attrs="{'readonly':[('state','in',['executed','annulled'])]}"/>
+			            	<field name="end_date" attrs="{'readonly':[('state','in',['executed','annulled'])]}"/>
+			            	<field name="execution_date"/>
+			            	<field name="executed_date"/>      		
+			            </group>
+			            <group col="4">
+			            	<field name="rescheduled"/>
+			            	<field name="postpone" attrs="{'readonly':[('state','in',['executed','annulled'])]}"/>
+			            	<field name="create_date"/>
+			            	<newline/>
+			            	<field name="programmed_by" colspan="4"/>
+			            	<field name="type_partakers" colspan="4" attrs="{'readonly':[('state','in',['executed','annulled'])]}"/>
+			            	<field name="remark" colspan="4" attrs="{'readonly':[('state','in',['executed','annulled'])]}"/>
+			            </group>
+			            </group>
+			            <notebook>
+			            	<page string="Task">
+				        		<field name="activity_task_ids" attrs="{'readonly':[('state','in',['executed','annulled'])]}">
+				        			<tree editable="bottom">
+				        				<field name="summary"/>
+										<field name="time" widget="float_time"/>
+										<field name="date"/>
+										<field name="staff_id"/>
+				        			</tree>
+				        		</field>
+				        	</page>
+				        	<page string="Attended">
+				        		<field name="patient_ids" attrs="{'readonly':[('state','in',['executed','annulled'])]}">
+				        			<tree editable="bottom">
+										<field name="display_name"/>
+										<field name="identification"/>
+										<field name="gender"/>
+										<field name="birthdate"/>
+										<field name="age"/>
+				        			</tree>
+				        		</field>
+				        	</page>
+				        	<page string="Medical Staff">
+				        		<field name="staff_ids" attrs="{'readonly':[('state','in',['executed','annulled'])]}">
+				        			<tree>
+				        				<field name="display_name"/>
+				        				<field name="profession_ids" widget="many2many_tags"/>
+										<field name="specialization_ids" widget="many2many_tags"/>
+				        			</tree>
+				        		</field>
+				        	</page>  
+				        	<page string="Nursing Attention">
+				        		<group col="1">
+					        		<field name="nursing_service_ids" nolabel="1" attrs="{'readonly':[('state','in',['executed','annulled'])]}">
+					        			<tree>
+					        				<field name="name"/>
+					        			</tree>
+					        		</field>
+					        		<group class="oe_subtotal_footer oe_right">
+						        		<field name="served_qty" widget="monetary"/>
+						        		<field name="total_served" widget="monetary"/>	
+					        		</group>
+				        		</group>
+				        	</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record model="ir.ui.view" id="medical_activity_graph_view">
+            <field name="name">medical.activity.graph.view</field>
+            <field name="model">medical.activity</field>
+			<field name="type">graph</field>
+            <field name="arch" type="xml"> 
+		        <graph string="graph" type="bar">
+	                <field name="state"/>
+	                <field name="activity_type_id"/>
+	            </graph>
+        	</field>
+    	</record>     	
+	 	<record model="ir.actions.act_window" id="medical_activity_action">
+	        <field name="name">Activities</field>
+	        <field name="res_model">medical.activity</field>	        
+	        <field name="view_type">form</field>
+	        <field name="view_mode">calendar,tree,form,graph</field>
+		</record>
+		<record model="ir.actions.act_window.view" id="medical_activity_action_view1">
+	        <field name="act_window_id" ref="medical_activity_action"/>
+	        <field name="sequence" eval="1"/>
+	        <field name="view_mode">calendar</field>
+	        <field name="view_id" ref="medical_activity_calendar_view"/>
+    	</record>
+		<record model="ir.actions.act_window.view" id="medical_activity_action_view2">
+	        <field name="act_window_id" ref="medical_activity_action"/>
+	        <field name="sequence" eval="2"/>
+	        <field name="view_mode">tree</field>
+	        <field name="view_id" ref="medical_activity_tree_view"/>
+    	</record>
+		<record model="ir.actions.act_window.view" id="medical_activity_action_view3">
+	        <field name="act_window_id" ref="medical_activity_action"/>
+	        <field name="sequence" eval="3"/>
+	        <field name="view_mode">form</field>
+	        <field name="view_id" ref="medical_activity_form_view"/>
+    	</record>
+		<record  model="ir.actions.act_window.view" id="medical_activity_action_view4">
+	        <field name="act_window_id" ref="medical_activity_action"/>
+	        <field name="sequence" eval="4"/>
+	        <field name="view_mode">graph</field>
+	        <field name="view_id" ref="medical_activity_graph_view"/>
+    	</record>
+    	
 	</data>
 </openerp>

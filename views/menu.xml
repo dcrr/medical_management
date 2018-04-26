@@ -3,11 +3,21 @@
 	<data>
     <menuitem name ="Medical Management" id="medical_management_root_menu"/>
 
+    <!-- <menuitem name ="Statistics" parent="medical_management_root_menu" id="medical_management_statistics_menu"  sequence="1"/>
+    <menuitem name ="Dashboard" id="dashboard_menu" parent="medical_management_statistics_menu" action="board_action" sequence="1" /> -->
+
     <menuitem name ="Services" parent="medical_management_root_menu" id="medical_management_service_menu"  sequence="1"/>
     
     <menuitem name ="Medical History" parent="medical_management_service_menu" id="medical_history_menu" action="medical_history_action" sequence="1"/>
     <menuitem name ="Schedule Appointment" parent="medical_management_service_menu" id="medical_schedule_appointment_menu" action="medical_appointment_calendar_action" sequence="2"/>
     <menuitem name ="Medical Appointment" parent="medical_management_service_menu" id="medical_appointment_menu" action="medical_appointment_action" sequence="3"/>
+    <menuitem name ="Activities" id="medical_activity_menu" action="medical_activity_action" parent="medical_management_service_menu" sequence="4"/>
+
+    <!-- <menuitem name ="Diet Employee" id="diet_employee_menu" action="diet_employee_action" parent="services_menu" sequence="7"/>
+    <menuitem name ="Sick Leave" id="sick_leave_nurse_menu" action="sick_leave_nurse_action" parent="services_menu" sequence="6"/>
+    <menuitem name ="Sick Leave" id="sick_leave_menu" action="sick_leave_action" parent="services_menu"  sequence="5"/>
+    <menuitem name ="Nursing Attention" id="nursing_attention_menu" action="nursing_attention_action" parent="services_menu" sequence="4"/>
+    <menuitem name ="Services to Patients Cited" id="medical_appointment_service_menu" action="medical_appointment_service_action" parent="services_menu"  sequence="3"/> -->
 
     <menuitem name ="Configuration" parent="medical_management_root_menu" id="medical_management_configuracion_menu"  sequence="2"/>
     

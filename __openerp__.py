@@ -9,6 +9,7 @@
 	'data' : ['views/views.xml',
               'views/menu.xml',
               'workflow/medical_appointment_wkf.xml',
+              'workflow/medical_activity_wkf.xml',
               'data/data.xml',
               ],
 	'active': True,

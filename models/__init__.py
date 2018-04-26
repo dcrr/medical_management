@@ -2,3 +2,4 @@
 
 import models
 import medical_appointment
+import medical_activity
