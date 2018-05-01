@@ -38,13 +38,13 @@ class medical_patient_service(models.Model):
 class medical_body_area(models.Model):
 	_name = "medical.body.area"
 	
-	body_system_type_id = fields.Many2one('medical.body.system.type', 'Type of System', ondelete="restrict")
-	body_part_id = fields.Many2one('medical.body.part', 'Body Part', ondelete="restrict")
+	body_system_type_id = fields.Many2one(comodel_name='medical.body.system.type',string='Type of System', ondelete="restrict")
+	body_part_id = fields.Many2one('medical.body.part', string='Body Part', ondelete="restrict")
 	on_left = fields.Boolean(string='On Left')
 	on_right = fields.Boolean(string='On Right')
 	on_both = fields.Boolean(string='On Both')
 	remark = fields.Char('Remark',size=650)
-	medical_appointment_id = fields.Many2one('medical.appointment', 'Medical Appointment')
+	medical_appointment_id = fields.Many2one('medical.appointment', string='Medical Appointment')
 
 class medical_appointment_template_analysis(models.Model):
     _name = 'medical.appointment.template.analysis'
@@ -136,6 +136,7 @@ class medical_patient(models.Model):
     blood_type = fields.Many2one('medical.blood.type', string='Blood Type')
     lefty = fields.Boolean('Lefty')
     type = fields.Selection(selection_add=[('patient', 'Patient')], string='Type')
+    diet_id = fields.Many2many('food.diet', string='Diet')
 
 def str2datetime(x):
     if not x: return False
